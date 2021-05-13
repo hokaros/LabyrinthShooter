@@ -300,6 +300,17 @@ int Labirynt::HorizontalCount() const {
 	return (y - 1) * x;
 }
 
+VectorInt Labirynt::GetExit(Direction side) const {
+	switch (side) {
+	case Direction::EAST:
+		return VectorInt(0, (y - 1) / 2);
+	case Direction::WEST:
+		return VectorInt(x, (y - 1) / 2);
+	default:
+		return GetExit(Direction::EAST);
+	}
+}
+
 bool Labirynt::operator[](int index) {
 	return walls[index];
 }

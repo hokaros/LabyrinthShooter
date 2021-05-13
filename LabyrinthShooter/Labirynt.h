@@ -1,4 +1,6 @@
 #pragma once
+#include "Vector.h"
+
 class Labirynt
 {
 	int x;
@@ -28,7 +30,7 @@ public:
 	int VerticalCount() const;
 	int HorizontalCount() const;
 
-
+	VectorInt GetExit(Direction side) const;
 
 	bool operator[](int index);
 

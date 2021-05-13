@@ -29,33 +29,36 @@ int main()
 	int red = SDL_MapRGB(screen->format, 0xFF, 0x00, 0x00);
 	int blue = SDL_MapRGB(screen->format, 0x00, 0x00, 0xAA);
 
-	// Stan gry
-	std::list<GameObject*> gameObjects;
-
-	LabyrinthSolidifier lab(10, 100, 5, 5, gameObjects);
-	for (int i = 0; i < lab.WallsCount(); i++) {
-		gameObjects.push_back(lab.GetWalls()[i]);
-	}
-
-	// TODO: pobieranie punktu wejściowego gracza
-	GameObject player(Vector(20, 20), Vector(0, 250), gameObjects);
-	player.AddComponent(new RectangleRenderer(player, screen, red, red));
-	player.AddComponent(new PlayerController(player, 300.0f));
-
-	Cage mapBorder(Vector(SCREEN_WIDTH, SCREEN_HEIGHT), gameObjects);
-
-	gameObjects.push_back(&player);
-	gameObjects.push_back(&mapBorder);
-
 	// Input
+	// Należy tu dodać wszystkie klawisze, które chce się odczytywać
 	SDL_KeyCode steeringKeys[] = { SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_a, SDLK_w, SDLK_d, SDLK_s };
 	size_t keyCount = sizeof(steeringKeys) / sizeof(SDL_KeyCode);
 	InputController input(steeringKeys, keyCount);
 
+	// Stan gry
 	Timer timer;
+
+	std::list<GameObject*> gameObjects;
+
+	Vector mapStart(10, 10);
+	LabyrinthSolidifier lab(mapStart, 10, 100, 5, 5, gameObjects);
+	for (int i = 0; i < lab.WallsCount(); i++) {
+		gameObjects.push_back(lab.GetWalls()[i]);
+	}
+	for (int i = 0; i < lab.BorderElements(); i++) {
+		gameObjects.push_back(lab.GetBorder()[i]);
+	}
+
+	// TODO: pobieranie punktu wejściowego gracza
+	GameObject player(Vector(20, 20), Vector(30, 250), gameObjects);
+	player.AddComponent(new RectangleRenderer(player, screen, red, red));
+	player.AddComponent(new PlayerController(player, 300.0f));
+
+	gameObjects.push_back(&player);
 
 	int quit = 0;
 
+	timer.NextFrame();
 	// Pętla gry
 	while (!quit) {
 		// Nowa klatka

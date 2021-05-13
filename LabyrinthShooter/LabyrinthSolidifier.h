@@ -8,24 +8,42 @@
 class LabyrinthSolidifier
 {
 public:
-	LabyrinthSolidifier(int wallWidth, int wallLength, int xCount, int yCount, const std::list<GameObject*> allObjects);
+	LabyrinthSolidifier(const Vector& pos, int wallWidth, int wallLength, int xCount, int yCount, const std::list<GameObject*>& allObjects);
 	~LabyrinthSolidifier();
 
+	const Labirynt& GetLab() const;
 	int WallsCount() const;
 	GameObject** GetWalls() const;
+	int BorderElements() const;
+	GameObject** GetBorder() const;
+	Vector GetSize() const;
 
 	void ChangeLab();
 
 	static Vector LabyrinthSize(int wallWidth, int wallLength, int xCount, int yCount);
 private:
+	Vector position;
+
 	int wallWidth;
 	int wallLength;
 	int xCount;
 	int yCount;
 
-	GameObject** walls; // œciany podzielone na pionowe i poziome
 	Labirynt labyrinth;
+
+	const std::list<GameObject*>& allObjects;
+	GameObject** walls; // œciany podzielone na pionowe i poziome
+	GameObject** border; // czêœci obwódki
+	int borderCount;
+
+	int wallColor;
+	int gateColor;
 private:
 	void PlaceWalls();
+
+	GameObject* BuildWall(const Vector& size);
+	GameObject* BuildWall(const Vector& size, int color);
+	void BuildBorder();
+	GameObject** BuildGateWall(Direction side);
 };
 

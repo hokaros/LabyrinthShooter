@@ -111,7 +111,9 @@ bool GameObject::IsLineInside(float min1, float max1, float min2, float max2) {
 }
 bool GameObject::DoLinesIntersect(float min1, float max1, float min2, float max2) {
 	return (min1 >= min2 && min1 <= max2)
-		|| (max1 >= min2 && max1 <= max2);
+		|| (max1 >= min2 && max1 <= max2)
+		|| (min2 >= min1 && min2 <= max1)
+		|| (max2 >= min1 && max2 <= max1);
 }
 
 void GameObject::BumpOut() {
