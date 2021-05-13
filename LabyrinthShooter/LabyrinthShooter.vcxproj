@@ -24,25 +24,31 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputController.h" />
     <ClInclude Include="IUpdateable.h" />
+    <ClInclude Include="Labirynt.h" />
+    <ClInclude Include="LabyrinthSolidifier.h" />
     <ClInclude Include="ObjectComponent.h" />
     <ClInclude Include="ObjectRenderer.h" />
     <ClInclude Include="PlayerController.h" />
     <ClInclude Include="RectangleRenderer.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Vector.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cage.cpp" />
     <ClCompile Include="Draw.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="InputController.cpp" />
+    <ClCompile Include="Labirynt.cpp" />
     <ClCompile Include="LabyrinthShooter.cpp" />
+    <ClCompile Include="LabyrinthSolidifier.cpp" />
     <ClCompile Include="ObjectComponent.cpp" />
     <ClCompile Include="ObjectRenderer.cpp" />
     <ClCompile Include="PlayerController.cpp" />
     <ClCompile Include="RectangleRenderer.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Vector.cpp" />
+    <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

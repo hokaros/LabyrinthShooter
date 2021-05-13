@@ -49,6 +49,15 @@ void GameObject::SetPosition(const Vector& newPosition) {
 	}
 }
 
+void GameObject::ForceSetPosition(const Vector& newPosition) {
+	position = Vector(newPosition);
+}
+
+void GameObject::SetSize(const Vector& newSize) {
+	size.x = newSize.x;
+	size.y = newSize.y;
+}
+
 bool GameObject::Collides(const GameObject& other) const {
 	if (!collisionEnabled || !other.collisionEnabled)
 		return false;
@@ -103,4 +112,8 @@ bool GameObject::IsLineInside(float min1, float max1, float min2, float max2) {
 bool GameObject::DoLinesIntersect(float min1, float max1, float min2, float max2) {
 	return (min1 >= min2 && min1 <= max2)
 		|| (max1 >= min2 && max1 <= max2);
+}
+
+void GameObject::BumpOut() {
+	// TODO
 }

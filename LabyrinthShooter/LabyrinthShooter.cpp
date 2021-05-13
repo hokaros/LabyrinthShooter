@@ -11,60 +11,19 @@
 #include "PlayerController.h"
 #include "Cage.h"
 #include <list>
+#include "Window.h"
+#include "LabyrinthSolidifier.h"
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
 int main()
 {
-	int rc;
-	SDL_Surface* screen, * charset;
-	SDL_Texture* scrtex;
-	SDL_Window* window;
-	SDL_Renderer* renderer;
-
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-		printf("SDL_Init error: %s\n", SDL_GetError());
+	Window window(SCREEN_WIDTH, SCREEN_HEIGHT);
+	if (!window.Init())
 		return 1;
-	}
 
-	// tryb pełnoekranowy / fullscreen mode
-//	rc = SDL_CreateWindowAndRenderer(0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP,
-//	                                 &window, &renderer);
-	rc = SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0,
-		&window, &renderer);
-	if (rc != 0) {
-		SDL_Quit();
-		printf("SDL_CreateWindowAndRenderer error: %s\n", SDL_GetError());
-		return 1;
-	};
-
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-	SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-
-	SDL_SetWindowTitle(window, "Labyrinth Shooter");
-
-	screen = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32,
-		0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-
-	scrtex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
-		SDL_TEXTUREACCESS_STREAMING,
-		SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	// wczytanie obrazka cs8x8.bmp
-	charset = SDL_LoadBMP("resources/cs8x8.bmp");
-	if (charset == NULL) {
-		printf("SDL_LoadBMP(resources/cs8x8.bmp) error: %s\n", SDL_GetError());
-		SDL_FreeSurface(screen);
-		SDL_DestroyTexture(scrtex);
-		SDL_DestroyWindow(window);
-		SDL_DestroyRenderer(renderer);
-		SDL_Quit();
-		return 1;
-	};
-
-	SDL_SetColorKey(charset, true, 0x000000);
+	SDL_Surface* screen = window.GetScreen();
 
 	int black = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
 	int red = SDL_MapRGB(screen->format, 0xFF, 0x00, 0x00);
@@ -73,17 +32,19 @@ int main()
 	// Stan gry
 	std::list<GameObject*> gameObjects;
 
-	GameObject player(Vector(100.0f, 100.0f), gameObjects);
+	LabyrinthSolidifier lab(10, 100, 5, 5, gameObjects);
+	for (int i = 0; i < lab.WallsCount(); i++) {
+		gameObjects.push_back(lab.GetWalls()[i]);
+	}
+
+	// TODO: pobieranie punktu wejściowego gracza
+	GameObject player(Vector(20, 20), Vector(0, 250), gameObjects);
 	player.AddComponent(new RectangleRenderer(player, screen, red, red));
 	player.AddComponent(new PlayerController(player, 300.0f));
-
-	GameObject wall(Vector(100.0f, 100.0f), Vector(300.0f, 300.0f), gameObjects);
-	wall.AddComponent(new RectangleRenderer(wall, screen, blue, blue));
 
 	Cage mapBorder(Vector(SCREEN_WIDTH, SCREEN_HEIGHT), gameObjects);
 
 	gameObjects.push_back(&player);
-	gameObjects.push_back(&wall);
 	gameObjects.push_back(&mapBorder);
 
 	// Input
@@ -111,15 +72,8 @@ int main()
 			go->Update();
 		}
 
-		// Renderowanie
-		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
-		//SDL_RenderClear(renderer);
-		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
-		SDL_RenderPresent(renderer);
-
+		window.Render();
 	}
 
-	SDL_DestroyWindow(window);
-	SDL_Quit();
 	return 0;
 }

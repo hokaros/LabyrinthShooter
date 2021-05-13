@@ -23,11 +23,17 @@ public:
 	bool CollidesWithAny() const;
 
 	void SetPosition(const Vector& newPosition);
+	// Ignoruje kolizje
+	void ForceSetPosition(const Vector& newPosition);
+	void SetSize(const Vector& newSize);
+
+	// Wypycha inne obiekty, jeœli koliduj¹
+	void BumpOut(); 
 
 	~GameObject();
 protected:
 	std::list<IUpdateable*> components;
-	// Dodatkowe parametry kolizji
+
 	bool collisionEnabled = true;
 	bool insideOutCollision = false;
 private:
