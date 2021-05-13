@@ -25,5 +25,6 @@ void PlayerController::Update() {
 
 	// Ruch
 	moveDir.Normalize();
-	gameObject.position += moveDir * movementSpeed * Timer::Main()->GetDeltaTime();
+	Vector dPos = moveDir * movementSpeed * Timer::Main()->GetDeltaTime();
+	gameObject.SetPosition(gameObject.GetPosition() + dPos);
 }

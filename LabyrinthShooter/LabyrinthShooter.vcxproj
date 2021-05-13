@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Cage.h" />
     <ClInclude Include="Draw.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputController.h" />
@@ -31,6 +32,7 @@
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Cage.cpp" />
     <ClCompile Include="Draw.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="InputController.cpp" />

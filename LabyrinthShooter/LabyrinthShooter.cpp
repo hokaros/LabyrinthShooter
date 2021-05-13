@@ -9,6 +9,8 @@
 #include "GameObject.h"
 #include "RectangleRenderer.h"
 #include "PlayerController.h"
+#include "Cage.h"
+#include <list>
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
@@ -66,25 +68,37 @@ int main()
 
 	int black = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
 	int red = SDL_MapRGB(screen->format, 0xFF, 0x00, 0x00);
+	int blue = SDL_MapRGB(screen->format, 0x00, 0x00, 0xAA);
 
 	// Stan gry
-	GameObject player(Vector(100.0f, 100.0f));
-	player.AddComponent(new RectangleRenderer(player, screen, red, red));
-	player.AddComponent(new PlayerController(player, 100.0f));
+	std::list<GameObject*> gameObjects;
 
-	int quit = 0;
+	GameObject player(Vector(100.0f, 100.0f), gameObjects);
+	player.AddComponent(new RectangleRenderer(player, screen, red, red));
+	player.AddComponent(new PlayerController(player, 300.0f));
+
+	GameObject wall(Vector(100.0f, 100.0f), Vector(300.0f, 300.0f), gameObjects);
+	wall.AddComponent(new RectangleRenderer(wall, screen, blue, blue));
+
+	Cage mapBorder(Vector(SCREEN_WIDTH, SCREEN_HEIGHT), gameObjects);
+
+	gameObjects.push_back(&player);
+	gameObjects.push_back(&wall);
+	gameObjects.push_back(&mapBorder);
+
+	// Input
 	SDL_KeyCode steeringKeys[] = { SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_a, SDLK_w, SDLK_d, SDLK_s };
 	size_t keyCount = sizeof(steeringKeys) / sizeof(SDL_KeyCode);
 	InputController input(steeringKeys, keyCount);
+
 	Timer timer;
 
-	double totalTime = 0.0;
+	int quit = 0;
 
 	// Pętla gry
 	while (!quit) {
 		// Nowa klatka
 		timer.NextFrame();
-		totalTime += timer.GetDeltaTime();
 
 		if (!input.Update()) {
 			quit = 1;
@@ -93,7 +107,9 @@ int main()
 		//generowanie tła
 		SDL_FillRect(screen, NULL, black);
 
-		player.Update();
+		for (GameObject* go : gameObjects) {
+			go->Update();
+		}
 
 		// Renderowanie
 		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
