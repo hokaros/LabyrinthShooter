@@ -1,9 +1,14 @@
 #include "LabyrinthSolidifier.h"
 
-LabyrinthSolidifier::LabyrinthSolidifier(const Vector& pos, int wallWidth, int wallLength, int xCount, int yCount, const std::list<GameObject*>& allObjects)
+LabyrinthSolidifier::LabyrinthSolidifier(const Vector& pos,
+	int wallWidth, int wallLength,
+	int xCount, int yCount,
+	const std::list<GameObject*>& allObjects,
+	double changeTime)
 	: position(pos), wallWidth(wallWidth), wallLength(wallLength),
 	xCount(xCount), yCount(yCount),
-	labyrinth(xCount, yCount), allObjects(allObjects)
+	labyrinth(xCount, yCount), allObjects(allObjects),
+	changeTime(changeTime)
 	{
 
 	SDL_Surface* screen = Window::Main()->GetScreen();
@@ -182,4 +187,12 @@ GameObject** LabyrinthSolidifier::BuildGateWall(Direction side) {
 	}
 
 	return w;
+}
+
+void LabyrinthSolidifier::Update() {
+	timeSinceLastChange += Timer::Main()->GetDeltaTime();
+	if (timeSinceLastChange >= changeTime) {
+		ChangeLab();
+		timeSinceLastChange = 0;
+	}
 }

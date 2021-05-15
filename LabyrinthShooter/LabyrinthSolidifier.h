@@ -5,10 +5,15 @@
 #include "Window.h"
 
 // Zamienia informacje o labiryncie na obiekty w grze i zarz¹dza nimi
-class LabyrinthSolidifier
+class LabyrinthSolidifier : public IUpdateable
 {
 public:
-	LabyrinthSolidifier(const Vector& pos, int wallWidth, int wallLength, int xCount, int yCount, const std::list<GameObject*>& allObjects);
+	LabyrinthSolidifier(const Vector& pos,
+		int wallWidth, int wallLength,
+		int xCount, int yCount,
+		const std::list<GameObject*>& allObjects,
+		double changeTime
+	);
 	~LabyrinthSolidifier();
 
 	const Labirynt& GetLab() const;
@@ -19,6 +24,8 @@ public:
 	Vector GetSize() const;
 
 	void ChangeLab();
+
+	void Update();
 
 	static Vector LabyrinthSize(int wallWidth, int wallLength, int xCount, int yCount);
 private:
@@ -38,6 +45,9 @@ private:
 
 	int wallColor;
 	int gateColor;
+
+	double changeTime;
+	double timeSinceLastChange;
 private:
 	void PlaceWalls();
 

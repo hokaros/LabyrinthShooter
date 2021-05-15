@@ -16,6 +16,7 @@
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
+#define LAB_TIME 0.5
 
 int main()
 {
@@ -41,7 +42,7 @@ int main()
 	std::list<GameObject*> gameObjects;
 
 	Vector mapStart(10, 10);
-	LabyrinthSolidifier lab(mapStart, 10, 100, 5, 5, gameObjects);
+	LabyrinthSolidifier lab(mapStart, 10, 100, 5, 5, gameObjects, LAB_TIME);
 	for (int i = 0; i < lab.WallsCount(); i++) {
 		gameObjects.push_back(lab.GetWalls()[i]);
 	}
@@ -74,6 +75,7 @@ int main()
 		for (GameObject* go : gameObjects) {
 			go->Update();
 		}
+		lab.Update();
 
 		window.Render();
 	}
