@@ -37,7 +37,7 @@ Vector::Vector(Direction direction) : x(0), y(0) {
 }
 
 void Vector::Normalize() {
-	float length = sqrtf(x * x + y * y);
+	float length = Length();
 	if (length == 0)
 		return;
 
@@ -45,16 +45,21 @@ void Vector::Normalize() {
 	y /= length;
 }
 
+void Vector::Sort() {
+	if (x <= y)
+		return;
 
-Vector operator+(const Vector& left, const Vector& right) {
-	Vector result;
-	result.x = left.x + right.x;
-	result.y = left.y + right.y;
-
-	return result;
+	float helper = x;
+	x = y;
+	y = x;
 }
 
-Vector operator+(const Vector& left, const VectorInt& right) {
+float Vector::Length() const {
+	return sqrtf(x * x + y * y);
+}
+
+
+Vector operator+(const Vector& left, const Vector& right) {
 	Vector result;
 	result.x = left.x + right.x;
 	result.y = left.y + right.y;
@@ -69,11 +74,26 @@ Vector& operator+=(Vector& left, const Vector& right) {
 	return left;
 }
 
+Vector operator-(const Vector& left, const Vector& right) {
+	Vector result;
+	result.x = left.x - right.x;
+	result.y = left.y - right.y;
+
+	return result;
+}
+
 Vector operator*(const Vector& left, float multiplier) {
 	Vector result;
 	result.x = left.x * multiplier;
 	result.y = left.y * multiplier;
 
+	return result;
+}
+
+Vector operator/(const Vector& left, float dividor) {
+	Vector result;
+	result.x = left.x / dividor;
+	result.y = left.y / dividor;
 	return result;
 }
 
@@ -117,10 +137,12 @@ VectorInt operator*(const VectorInt& left, int multiplier) {
 	return result;
 }
 
-Vector operator*(const VectorInt& left, float multiplier) {
-	Vector result;
-	result.x = left.x * multiplier;
-	result.y = left.y * multiplier;
 
-	return result;
- }
+Rect::Rect(const Vector& position, const Vector& size)
+	: pos(position), size(size) {
+
+}
+
+Vector Rect::GetMiddle() const {
+	return pos + size / 2;
+}

@@ -80,8 +80,7 @@ void LabyrinthSolidifier::PlaceWalls() {
 				// Obecna œciana
 				GameObject* wall = walls[nextWall++];
 				wall->SetSize(verticalWall);
-				wall->ForceSetPosition(Vector(x * wallLength, y * wallLength) + position);
-				wall->BumpOut();
+				wall->SetPosition(Vector(x * wallLength, y * wallLength) + position);
 			}
 		}
 	}
@@ -95,8 +94,7 @@ void LabyrinthSolidifier::PlaceWalls() {
 				// Obecna œciana
 				GameObject* wall = walls[nextWall++];
 				wall->SetSize(horizontalWall);
-				wall->ForceSetPosition(Vector(x * wallLength, y * wallLength) + position);
-				wall->BumpOut();
+				wall->SetPosition(Vector(x * wallLength, y * wallLength) + position);
 			}
 		}
 	}
@@ -113,7 +111,10 @@ GameObject* LabyrinthSolidifier::BuildWall(const Vector& size) {
 
 GameObject* LabyrinthSolidifier::BuildWall(const Vector& size, int color) {
 	GameObject* wall = new GameObject(size, allObjects);
+
 	wall->AddComponent(new RectangleRenderer(*wall, Window::Main()->GetScreen(), color, color));
+	wall->isStatic = true;
+
 	return wall;
 }
 
@@ -129,10 +130,10 @@ void LabyrinthSolidifier::BuildBorder() {
 	Vector nextPos = position;
 	Vector elemSize(GetSize().x, wallWidth);
 	border[6] = BuildWall(elemSize);
-	border[6]->ForceSetPosition(nextPos);
+	border[6]->SetPosition(nextPos);
 	nextPos.y += yCount * wallLength;
 	border[7] = BuildWall(elemSize);
-	border[7]->ForceSetPosition(nextPos);
+	border[7]->SetPosition(nextPos);
 }
 
 GameObject** LabyrinthSolidifier::BuildGateWall(Direction side) {
@@ -150,13 +151,13 @@ GameObject** LabyrinthSolidifier::BuildGateWall(Direction side) {
 	if (side == Direction::EAST || side == Direction::WEST) {
 		Vector elemSize(wallWidth, exit.y * wallLength);
 		w[0] = BuildWall(elemSize);
-		w[0]->ForceSetPosition(nextPos);
+		w[0]->SetPosition(nextPos);
 		nextPos.y += elemSize.y;
 
 		// Brama
 		elemSize = Vector(wallWidth, wallLength);
 		w[1] = BuildWall(elemSize, gateColor);
-		w[1]->ForceSetPosition(nextPos);
+		w[1]->SetPosition(nextPos);
 		nextPos.y += elemSize.y;
 
 		elemSize = Vector(
@@ -164,18 +165,18 @@ GameObject** LabyrinthSolidifier::BuildGateWall(Direction side) {
 			(yCount - exit.y - 1) * wallLength
 		);
 		w[2] = BuildWall(elemSize);
-		w[2]->ForceSetPosition(nextPos);
+		w[2]->SetPosition(nextPos);
 	}
 	else {
 		Vector elemSize(exit.x * wallLength, wallWidth);
 		w[0] = BuildWall(elemSize);
-		w[0]->ForceSetPosition(nextPos);
+		w[0]->SetPosition(nextPos);
 		nextPos.x += elemSize.x;
 
 		// Brama
 		elemSize = Vector(wallLength, wallWidth);
 		w[1] = BuildWall(elemSize, gateColor);
-		w[1]->ForceSetPosition(nextPos);
+		w[1]->SetPosition(nextPos);
 		nextPos.x += elemSize.x;
 
 		elemSize = Vector(
@@ -183,7 +184,7 @@ GameObject** LabyrinthSolidifier::BuildGateWall(Direction side) {
 			wallWidth
 		);
 		w[2] = BuildWall(elemSize);
-		w[2]->ForceSetPosition(nextPos);
+		w[2]->SetPosition(nextPos);
 	}
 
 	return w;
