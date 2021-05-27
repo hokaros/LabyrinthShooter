@@ -46,12 +46,32 @@ Vector GameObject::GetMiddle() const {
 }
 
 void GameObject::SetPosition(const Vector& newPosition) {
+	Vector offset = newPosition - position;
 	position = newPosition;
+
+	// Przesuniêcie dzieci
+	for (GameObject* child : children) {
+		child->SetPosition(child->position + offset);
+	}
 }
 
 void GameObject::SetSize(const Vector& newSize) {
+	Vector sizeChange(newSize.x / size.x, newSize.y / size.y);
+
 	size.x = newSize.x;
 	size.y = newSize.y;
+
+	// Rozmiar dzieci
+	for (GameObject* child : children) {
+		Vector childNewSize(child->size.x * sizeChange.x, child->size.y * sizeChange.y);
+		child->SetSize(childNewSize);
+	}
+}
+
+void GameObject::AddChild(GameObject* child) {
+	child->parent = this;
+
+	children.push_back(child);
 }
 
 bool GameObject::Collides(const GameObject& other) const {

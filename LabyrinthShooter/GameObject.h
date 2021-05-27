@@ -29,6 +29,8 @@ public:
 	void SetPosition(const Vector& newPosition);
 	void SetSize(const Vector& newSize);
 
+	void AddChild(GameObject* child);
+
 
 	~GameObject();
 protected:
@@ -39,6 +41,9 @@ protected:
 private:
 	Vector size;
 	Vector position;
+
+	GameObject* parent = NULL;
+	std::list<GameObject*> children;
 
 	const std::list<GameObject*>& allObjects;
 private:
