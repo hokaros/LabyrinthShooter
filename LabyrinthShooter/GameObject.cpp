@@ -49,7 +49,7 @@ void GameObject::Update() {
 		component->Update();
 	}
 
-	BumpOut();
+	HandleCollisions();
 }
 
 const Vector& GameObject::GetSize() const {
@@ -217,12 +217,19 @@ Vector GameObject::LinesIntersection(float min1, float max1, float min2, float m
 	return Vector(start, end);
 }
 
-void GameObject::BumpOut() {
+void GameObject::HandleCollisions() {
 	for (GameObject* go : allObjects) {
 		if (go == this || go->isStatic)
 			continue;
 
 		if (Collides(*go)) {
+			if (onCollision) {
+				onCollision(*go);
+			}
+			if (go->onCollision) {
+				go->onCollision(*this);
+			}
+
 			BumpOut(*go);
 		}
 	}

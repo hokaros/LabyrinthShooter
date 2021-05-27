@@ -1,5 +1,6 @@
 #pragma once
 #include "ObjectComponent.h"
+#include "ObjectManager.h"
 
 // Obiekt biegn¹cy przed siebie do momentu kolizji
 class Bullet :

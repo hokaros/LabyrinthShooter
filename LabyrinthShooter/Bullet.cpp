@@ -16,7 +16,9 @@ void Bullet::Update() {
 }
 
 void Bullet::OnCollision(GameObject& collider) {
-	// Sprawdzenie, czy gracz
+	// TODO: obs³uga trafienia gracza
+
+	ObjectManager::Main()->DestroyObject(&gameObject);
 }
 
 ObjectComponent* Bullet::Copy(GameObject& newOwner) {

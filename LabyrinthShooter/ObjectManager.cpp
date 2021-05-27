@@ -32,6 +32,21 @@ void ObjectManager::AddUndestroyable(GameObject* gameObject) {
 	allObjects.push_back(gameObject);
 }
 
+void ObjectManager::DestroyObject(GameObject* gameObject) {
+	destroyed.push_back(gameObject);
+	// Rozwa¿yæ wy³¹czenie obiektu, zanim zostanie usuniêty
+}
+
+void ObjectManager::DisposeDestroyed() {
+	for (GameObject* go : destroyed) {
+		delete go;
+		destroyables.remove(go);
+		allObjects.remove(go);
+	}
+
+	destroyed.clear();
+}
+
 const std::list<GameObject*>& ObjectManager::GetAllObjects() const {
 	return allObjects;
 }

@@ -53,8 +53,8 @@ private:
 
 	const std::list<GameObject*>& allObjects;
 private:
-	// Wypycha inne obiekty, jeœli koliduj¹
-	void BumpOut();
+	void HandleCollisions();
+	// Wypycha inny obiekt podczas kolizji
 	void BumpOut(GameObject& other);
 
 	bool DoesIntersect(const GameObject& other) const;

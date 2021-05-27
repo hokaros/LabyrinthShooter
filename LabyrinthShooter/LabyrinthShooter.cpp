@@ -21,7 +21,7 @@
 #define SCREEN_HEIGHT 600
 #define LAB_TIME 0.5
 
-#define BULLET_SPEED 100
+#define BULLET_SPEED 1000
 #define WPN_BASIC_RELOAD 1
 
 int main()
@@ -105,6 +105,8 @@ int main()
 		lab.Update();
 
 		window.Render();
+
+		objectManager.DisposeDestroyed();
 	}
 
 	return 0;
