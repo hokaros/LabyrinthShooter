@@ -19,14 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bullet.h" />
     <ClInclude Include="Cage.h" />
     <ClInclude Include="Draw.h" />
+    <ClInclude Include="Firearm.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputController.h" />
     <ClInclude Include="IUpdateable.h" />
     <ClInclude Include="Labirynt.h" />
     <ClInclude Include="LabyrinthSolidifier.h" />
     <ClInclude Include="ObjectComponent.h" />
+    <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="ObjectRenderer.h" />
     <ClInclude Include="PlayerController.h" />
     <ClInclude Include="RectangleRenderer.h" />
@@ -35,14 +38,17 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Cage.cpp" />
     <ClCompile Include="Draw.cpp" />
+    <ClCompile Include="Firearm.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="InputController.cpp" />
     <ClCompile Include="Labirynt.cpp" />
     <ClCompile Include="LabyrinthShooter.cpp" />
     <ClCompile Include="LabyrinthSolidifier.cpp" />
     <ClCompile Include="ObjectComponent.cpp" />
+    <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="ObjectRenderer.cpp" />
     <ClCompile Include="PlayerController.cpp" />
     <ClCompile Include="RectangleRenderer.cpp" />

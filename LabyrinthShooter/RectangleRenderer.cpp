@@ -17,3 +17,7 @@ void RectangleRenderer::Render(SDL_Surface* screen) {
 		fillColor
 	);
 }
+
+ObjectComponent* RectangleRenderer::Copy(GameObject& newOwner) {
+	return new RectangleRenderer(newOwner, screen, outlineColor, fillColor);
+}

@@ -2,6 +2,7 @@
 #include "Vector.h"
 #include "Timer.h"
 #include "IUpdateable.h"
+#include <functional>
 
 #include <list>
 #define BUMPOUT_SPEED 10000.0
@@ -9,11 +10,16 @@
 class GameObject
 {
 public:
+	bool isEnabled = true;
 	bool isStatic = false;
+	bool collisionEnabled = true;
+
+	std::function<void(GameObject& collider)> onCollision;
 public:
 	GameObject(const std::list<GameObject*>& allObjects);
 	GameObject(const Vector& size, const std::list<GameObject*>& allObjects);
 	GameObject(const Vector& size, const Vector& position, const std::list<GameObject*>& allObjects);
+	GameObject(const GameObject& other);
 
 	void AddComponent(IUpdateable* component);
 
@@ -27,6 +33,7 @@ public:
 	bool CollidesWithAny() const;
 
 	void SetPosition(const Vector& newPosition);
+	void Translate(const Vector& offset); // przesuniêcie
 	void SetSize(const Vector& newSize);
 
 	void AddChild(GameObject* child);
@@ -36,7 +43,6 @@ public:
 protected:
 	std::list<IUpdateable*> components;
 
-	bool collisionEnabled = true;
 	bool insideOutCollision = false;
 private:
 	Vector size;

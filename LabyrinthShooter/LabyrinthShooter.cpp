@@ -13,10 +13,16 @@
 #include <list>
 #include "Window.h"
 #include "LabyrinthSolidifier.h"
+#include "ObjectManager.h"
+#include "Bullet.h"
+#include "Firearm.h"
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 #define LAB_TIME 0.5
+
+#define BULLET_SPEED 100
+#define WPN_BASIC_RELOAD 1
 
 int main()
 {
@@ -32,30 +38,49 @@ int main()
 
 	// Input
 	// Należy tu dodać wszystkie klawisze, które chce się odczytywać
-	SDL_KeyCode steeringKeys[] = { SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_a, SDLK_w, SDLK_d, SDLK_s };
+	SDL_KeyCode steeringKeys[] = { SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_a, SDLK_w, SDLK_d, SDLK_s, SDLK_SPACE };
 	size_t keyCount = sizeof(steeringKeys) / sizeof(SDL_KeyCode);
 	InputController input(steeringKeys, keyCount);
 
 	// Stan gry
 	Timer timer;
 
-	std::list<GameObject*> gameObjects;
+	ObjectManager objectManager;
 
 	Vector mapStart(10, 10);
-	LabyrinthSolidifier lab(mapStart, 10, 100, 5, 5, gameObjects, LAB_TIME);
+	LabyrinthSolidifier lab(mapStart, 10, 100, 5, 5, objectManager.GetAllObjects(), LAB_TIME);
 	for (int i = 0; i < lab.WallsCount(); i++) {
-		gameObjects.push_back(lab.GetWalls()[i]);
+		objectManager.AddUndestroyable(lab.GetWalls()[i]);
 	}
 	for (int i = 0; i < lab.BorderElements(); i++) {
-		gameObjects.push_back(lab.GetBorder()[i]);
+		objectManager.AddUndestroyable(lab.GetBorder()[i]);
 	}
 
-	// TODO: pobieranie punktu wejściowego gracza
-	GameObject player(Vector(20, 20), Vector(30, 250), gameObjects);
-	player.AddComponent(new RectangleRenderer(player, screen, red, red));
-	player.AddComponent(new PlayerController(player, 300.0f));
+	// TODO: pobieranie pozycji wejściowej gracza
+	GameObject* player = new GameObject(Vector(20, 20), Vector(30, 250), objectManager.GetAllObjects());
+	player->AddComponent(new RectangleRenderer(*player, screen, red, red));
+	player->AddComponent(new PlayerController(*player, 300.0f));
+	objectManager.AddObject(player);
+	// Prefab pocisku
+	GameObject basicBullet(
+		Vector(4, 4),
+		objectManager.GetAllObjects()
+	);
+	basicBullet.AddComponent(new Bullet(basicBullet, BULLET_SPEED));
+	basicBullet.AddComponent(new RectangleRenderer(basicBullet, screen, red, red));
+	// Broń
+	GameObject* basicWeapon = new GameObject(
+		Vector(20, 4),
+		player->GetPosition() + Vector(Direction::EAST) * player->GetSize().x,
+		objectManager.GetAllObjects()
+	);
+	basicWeapon->AddComponent(new Firearm(*basicWeapon, basicBullet, WPN_BASIC_RELOAD));
+	basicWeapon->AddComponent(new RectangleRenderer(*basicWeapon, screen, blue, blue));
+	basicWeapon->collisionEnabled = false;
 
-	gameObjects.push_back(&player);
+	player->AddChild(basicWeapon);
+	objectManager.AddObject(basicWeapon);
+
 
 	int quit = 0;
 
@@ -72,8 +97,10 @@ int main()
 		//generowanie tła
 		SDL_FillRect(screen, NULL, black);
 
-		for (GameObject* go : gameObjects) {
-			go->Update();
+		for (GameObject* go : objectManager.GetAllObjects()) {
+			if (go->isEnabled) {
+				go->Update();
+			}
 		}
 		lab.Update();
 

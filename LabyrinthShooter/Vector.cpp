@@ -18,11 +18,11 @@ Vector::Vector(const VectorInt& other)
 Vector::Vector(Direction direction) : x(0), y(0) {
 	switch (direction) {
 	case Direction::EAST:
-		x = -1;
+		x = 1;
 		y = 0;
 		break;
 	case Direction::WEST:
-		x = 1;
+		x = -1;
 		y = 0;
 		break;
 	case Direction::NORTH:

@@ -27,6 +27,10 @@ LabyrinthSolidifier::LabyrinthSolidifier(const Vector& pos,
 	labyrinth.PrintLab();
 }
 
+IUpdateable* LabyrinthSolidifier::Copy() {
+	return new LabyrinthSolidifier(*this);
+}
+
 LabyrinthSolidifier::~LabyrinthSolidifier() {
 	for (int i = 0; i < labyrinth.ActiveCount(); i++) {
 		delete walls[i];

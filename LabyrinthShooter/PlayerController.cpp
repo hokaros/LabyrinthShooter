@@ -28,3 +28,7 @@ void PlayerController::Update() {
 	Vector dPos = moveDir * movementSpeed * Timer::Main()->GetDeltaTime();
 	gameObject.SetPosition(gameObject.GetPosition() + dPos);
 }
+
+ObjectComponent* PlayerController::Copy(GameObject& newOwner) {
+	return new PlayerController(newOwner, movementSpeed);
+}

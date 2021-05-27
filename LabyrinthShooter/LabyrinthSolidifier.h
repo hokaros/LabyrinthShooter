@@ -27,6 +27,7 @@ public:
 
 	void Update();
 
+	IUpdateable* Copy() override;
 	static Vector LabyrinthSize(int wallWidth, int wallLength, int xCount, int yCount);
 private:
 	Vector position;

@@ -7,6 +7,9 @@ class ObjectComponent : public IUpdateable
 {
 public:
 	ObjectComponent(GameObject& owner);
+
+	IUpdateable* Copy() override;
+	virtual ObjectComponent* Copy(GameObject& newOwner) = 0;
 protected:
 	GameObject& gameObject;
 };

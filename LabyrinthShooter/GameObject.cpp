@@ -1,4 +1,5 @@
 #include "GameObject.h"
+#include "ObjectComponent.h"
 
 GameObject::GameObject(const std::list<GameObject*>& allObjects)
 	: size(1, 1), allObjects(allObjects) {
@@ -13,6 +14,24 @@ GameObject::GameObject(const Vector& size, const std::list<GameObject*>& allObje
 GameObject::GameObject(const Vector& size, const Vector& position, const std::list<GameObject*>& allObjects)
 	: position(position), size(size), allObjects(allObjects) {
 
+}
+
+GameObject::GameObject(const GameObject& other) 
+	: GameObject(other.size, other.position, other.allObjects) {
+	for (IUpdateable* component : other.components) {
+		IUpdateable* cmpCpy;
+
+		// Rzutowanie na ObjectComponent, aby zmieniæ w³aœciciela
+		ObjectComponent* objCmp = static_cast<ObjectComponent*>(component);
+		if (objCmp != NULL) {
+			cmpCpy = objCmp->Copy(*this);
+		}
+		else {
+			cmpCpy = component->Copy();
+		}
+
+		components.push_back(cmpCpy);
+	}
 }
 
 GameObject::~GameObject() {
@@ -49,9 +68,16 @@ void GameObject::SetPosition(const Vector& newPosition) {
 	Vector offset = newPosition - position;
 	position = newPosition;
 
-	// Przesuniêcie dzieci
 	for (GameObject* child : children) {
-		child->SetPosition(child->position + offset);
+		child->Translate(offset);
+	}
+}
+
+void GameObject::Translate(const Vector& offset) {
+	position += offset;
+
+	for (GameObject* child : children) {
+		child->Translate(offset);
 	}
 }
 
@@ -204,8 +230,6 @@ void GameObject::BumpOut() {
 
 void GameObject::BumpOut(GameObject& other) {
 	// Tylko jeœli koliduje z other
-	if (other.position.y < position.y)
-		int x = 1;
 	Rect intersection = GetIntersection(other);
 
 	Vector outVector = other.GetMiddle() - intersection.GetMiddle();
@@ -216,5 +240,5 @@ void GameObject::BumpOut(GameObject& other) {
 	float speed = BUMPOUT_SPEED / outVector.Length(); // im bli¿ej, tym bardziej odpycha
 	outVector.Normalize();
 	Vector dPos = outVector * speed * Timer::Main()->GetDeltaTime();
-	other.position += dPos;
+	other.Translate(dPos);
 }
