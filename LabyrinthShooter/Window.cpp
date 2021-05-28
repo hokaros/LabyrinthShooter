@@ -78,9 +78,30 @@ void Window::Render() {
 	SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
 	//SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, scrtex, NULL, NULL);
+
+	for (TextureRenderArgs tra : renderTextures) {
+		SDL_Point mid;
+		mid.x = tra.rect.x + tra.rect.w / 2;
+		mid.y = tra.rect.y + tra.rect.h / 2;
+		SDL_RenderCopyEx(renderer, tra.texture, NULL, &(tra.rect), tra.angle, &mid, SDL_FLIP_NONE);
+
+		SDL_DestroyTexture(tra.texture);
+	}
+	renderTextures.clear();
+
 	SDL_RenderPresent(renderer);
+}
+
+void Window::RenderTexture(SDL_Texture* texture, const SDL_Rect& rect, double angle) {
+	renderTextures.push_back(
+		TextureRenderArgs(texture, rect, angle)
+	);
 }
 
 SDL_Surface* Window::GetScreen() const {
 	return screen;
+}
+
+SDL_Renderer* Window::GetRenderer() const {
+	return renderer;
 }

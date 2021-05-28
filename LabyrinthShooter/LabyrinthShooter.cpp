@@ -8,6 +8,7 @@
 #include "Vector.h"
 #include "GameObject.h"
 #include "RectangleRenderer.h"
+#include "SpriteRenderer.h"
 #include "PlayerController.h"
 #include "Cage.h"
 #include <list>
@@ -31,6 +32,11 @@ int main()
 		return 1;
 
 	SDL_Surface* screen = window.GetScreen();
+	SDL_Surface* playerBmp = SDL_LoadBMP("resources/player.bmp");
+	if (playerBmp == NULL) {
+		printf("Nie udalo sie zaladowac resources/player.bmp\n");
+		return 1;
+	}
 
 	int black = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
 	int red = SDL_MapRGB(screen->format, 0xFF, 0x00, 0x00);
@@ -58,7 +64,8 @@ int main()
 
 	// TODO: pobieranie pozycji wejściowej gracza
 	GameObject* player = new GameObject(Vector(20, 20), Vector(30, 250), objectManager.GetAllObjects());
-	player->AddComponent(new RectangleRenderer(*player, screen, red, red));
+	player->AddComponent(new SpriteRenderer(*player, screen, playerBmp));
+	//player->AddComponent(new RectangleRenderer(*player, screen, red, red));
 	player->AddComponent(new PlayerController(*player, 300.0f));
 	objectManager.AddObject(player);
 	// Prefab pocisku
@@ -108,6 +115,8 @@ int main()
 
 		objectManager.DisposeDestroyed();
 	}
+
+	SDL_FreeSurface(playerBmp);
 
 	return 0;
 }

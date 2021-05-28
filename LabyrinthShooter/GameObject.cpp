@@ -56,6 +56,10 @@ const Vector& GameObject::GetSize() const {
 	return size;
 }
 
+double GameObject::GetRotation() const {
+	return rotation;
+}
+
 const Vector& GameObject::GetPosition() const {
 	return position;
 }
@@ -92,6 +96,31 @@ void GameObject::SetSize(const Vector& newSize) {
 		Vector childNewSize(child->size.x * sizeChange.x, child->size.y * sizeChange.y);
 		child->SetSize(childNewSize);
 	}
+}
+
+void GameObject::Rotate(double angle) {
+	double prevRot = rotation;
+	double newRot = rotation + angle;
+	double newRotRadians = newRot * M_PI / 180;
+
+	Vector middle = position + size / 2;
+	
+	for (GameObject* child : children) {
+		child->Rotate(angle);
+
+		Vector childMid = child->position + child->size / 2;
+		double radius = (middle - childMid).Length();
+
+		Vector childNewPos(
+			cos(newRotRadians) * radius,
+			sin(newRotRadians) * radius
+		);
+		Vector dPos = childNewPos - child->position;
+
+		child->Translate(dPos);
+	}
+
+	rotation += angle;
 }
 
 void GameObject::AddChild(GameObject* child) {

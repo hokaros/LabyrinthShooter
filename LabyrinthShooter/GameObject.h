@@ -3,6 +3,7 @@
 #include "Timer.h"
 #include "IUpdateable.h"
 #include <functional>
+#include <math.h>
 
 #include <list>
 #define BUMPOUT_SPEED 10000.0
@@ -28,6 +29,7 @@ public:
 
 	const Vector& GetPosition() const;
 	const Vector& GetSize() const;
+	double GetRotation() const;
 	Vector GetMiddle() const;
 	bool Collides(const GameObject& other) const;
 	bool CollidesWithAny() const;
@@ -35,6 +37,7 @@ public:
 	void SetPosition(const Vector& newPosition);
 	void Translate(const Vector& offset); // przesuniêcie
 	void SetSize(const Vector& newSize);
+	void Rotate(double angle);
 
 	void AddChild(GameObject* child);
 
@@ -47,6 +50,7 @@ protected:
 private:
 	Vector size;
 	Vector position;
+	double rotation = 0.0;
 
 	GameObject* parent = NULL;
 	std::list<GameObject*> children;

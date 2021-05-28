@@ -2,6 +2,16 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_main.h>
+#include <list>
+
+struct TextureRenderArgs {
+	SDL_Texture* texture;
+	SDL_Rect rect;
+	double angle;
+
+	TextureRenderArgs(SDL_Texture* texture, SDL_Rect rect, double angle)
+		: texture(texture), rect(rect), angle(angle) {}
+};
 
 class Window
 {
@@ -12,7 +22,10 @@ public:
 	bool Init();
 	void Render();
 
+	void RenderTexture(SDL_Texture* texture, const SDL_Rect& rect, double angle);
+
 	SDL_Surface* GetScreen() const;
+	SDL_Renderer* GetRenderer() const;
 
 	static Window* Main();
 private:
@@ -24,6 +37,8 @@ private:
 	SDL_Texture* scrtex = NULL;
 	SDL_Window* window = NULL;
 	SDL_Renderer* renderer = NULL;
+
+	std::list<TextureRenderArgs> renderTextures;
 
 	static Window* mainWindow;
 };
