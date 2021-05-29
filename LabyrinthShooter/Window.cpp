@@ -81,8 +81,8 @@ void Window::Render() {
 
 	for (TextureRenderArgs tra : renderTextures) {
 		SDL_Point mid;
-		mid.x = tra.rect.x + tra.rect.w / 2;
-		mid.y = tra.rect.y + tra.rect.h / 2;
+		mid.x = tra.rect.w / 2;
+		mid.y = tra.rect.h / 2;
 		SDL_RenderCopyEx(renderer, tra.texture, NULL, &(tra.rect), tra.angle, &mid, SDL_FLIP_NONE);
 
 		SDL_DestroyTexture(tra.texture);

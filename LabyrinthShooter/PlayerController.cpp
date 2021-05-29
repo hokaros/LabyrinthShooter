@@ -6,6 +6,15 @@ PlayerController::PlayerController(GameObject& player, float movementSpeed)
 }
 
 void PlayerController::Update() {
+	ProcessMovement();
+	ProcessAim();
+}
+
+ObjectComponent* PlayerController::Copy(GameObject& newOwner) {
+	return new PlayerController(newOwner, movementSpeed);
+}
+
+void PlayerController::ProcessMovement() {
 	InputController* input = InputController::Main();
 
 	// Odczytanie wciœniêtych klawiszy
@@ -29,6 +38,10 @@ void PlayerController::Update() {
 	gameObject.SetPosition(gameObject.GetPosition() + dPos);
 }
 
-ObjectComponent* PlayerController::Copy(GameObject& newOwner) {
-	return new PlayerController(newOwner, movementSpeed);
+void PlayerController::ProcessAim() {
+	InputController* input = InputController::Main();
+
+	Vector mousePos = input->GetMousePosition();
+
+	gameObject.LookAt(mousePos);
 }

@@ -103,24 +103,33 @@ void GameObject::Rotate(double angle) {
 	double newRot = rotation + angle;
 	double newRotRadians = newRot * M_PI / 180;
 
-	Vector middle = position + size / 2;
+	Vector middle = GetMiddle();
 	
 	for (GameObject* child : children) {
 		child->Rotate(angle);
 
-		Vector childMid = child->position + child->size / 2;
+		Vector childMid = child->GetMiddle();
 		double radius = (middle - childMid).Length();
 
 		Vector childNewPos(
 			cos(newRotRadians) * radius,
 			sin(newRotRadians) * radius
 		);
-		Vector dPos = childNewPos - child->position;
+		childNewPos += middle;
+		Vector dPos = childNewPos - childMid;
 
 		child->Translate(dPos);
 	}
 
 	rotation += angle;
+}
+
+void GameObject::LookAt(const Vector& point) {
+	Vector toPoint = point - GetMiddle();
+	double lookRotation = atan2(toPoint.y, toPoint.x) * 180 / M_PI;
+
+	double dRot = lookRotation - rotation;
+	Rotate(dRot);
 }
 
 void GameObject::AddChild(GameObject* child) {
@@ -248,7 +257,7 @@ Vector GameObject::LinesIntersection(float min1, float max1, float min2, float m
 
 void GameObject::HandleCollisions() {
 	for (GameObject* go : allObjects) {
-		if (go == this || go->isStatic)
+		if (go == this || go->isStatic || !go->isEnabled)
 			continue;
 
 		if (Collides(*go)) {

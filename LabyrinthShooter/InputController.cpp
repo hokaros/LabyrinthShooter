@@ -63,3 +63,10 @@ bool InputController::IsKeyDown(SDL_KeyCode key) const {
 
 	return false; // nie nale¿y do zarz¹dzanych klawiszy
 }
+
+Vector InputController::GetMousePosition() const {
+	int x, y;
+	SDL_GetMouseState(&x, &y);
+
+	return Vector(x, y);
+}

@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <SDL.h>
+#include "Vector.h"
 
 class InputController
 {
@@ -10,6 +11,8 @@ public:
 	// Aktualizuje statusy klawiszy. Zwraca false, jeœli zamkniêto okno
 	bool Update();
 	bool IsKeyDown(SDL_KeyCode key) const;
+
+	Vector GetMousePosition() const;
 
 	static InputController* Main();
 private:

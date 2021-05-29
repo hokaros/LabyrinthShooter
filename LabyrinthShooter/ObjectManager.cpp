@@ -34,7 +34,7 @@ void ObjectManager::AddUndestroyable(GameObject* gameObject) {
 
 void ObjectManager::DestroyObject(GameObject* gameObject) {
 	destroyed.push_back(gameObject);
-	// Rozwa¿yæ wy³¹czenie obiektu, zanim zostanie usuniêty
+	gameObject->isEnabled = false;
 }
 
 void ObjectManager::DisposeDestroyed() {

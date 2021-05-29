@@ -13,5 +13,8 @@ public:
 protected:
 	// Prêdkoœæ [piksele na sekundê]
 	float movementSpeed;
+private:
+	void ProcessMovement();
+	void ProcessAim();
 };
 

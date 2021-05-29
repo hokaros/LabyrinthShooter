@@ -34,6 +34,9 @@ void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y) {
 
 
 void DrawPixel(SDL_Surface* surface, int x, int y, Uint32 color) {
+	if (x < 0 || y < 0)
+		return;
+
 	int bpp = surface->format->BytesPerPixel;
 	Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
 	*(Uint32*)p = color;

@@ -38,6 +38,8 @@ public:
 	void Translate(const Vector& offset); // przesuniêcie
 	void SetSize(const Vector& newSize);
 	void Rotate(double angle);
+	// Obraca tak, aby oœ X obiektu by³a skierowana w stronê danego punktu
+	void LookAt(const Vector& point);
 
 	void AddChild(GameObject* child);
 
