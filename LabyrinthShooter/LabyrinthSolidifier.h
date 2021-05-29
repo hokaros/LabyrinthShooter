@@ -2,7 +2,10 @@
 #include "Labirynt.h"
 #include "GameObject.h"
 #include "RectangleRenderer.h"
+#include "Regenerable.h"
 #include "Window.h"
+
+#define WALL_REGEN 5.0
 
 // Zamienia informacje o labiryncie na obiekty w grze i zarz¹dza nimi
 class LabyrinthSolidifier : public IUpdateable

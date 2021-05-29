@@ -33,6 +33,9 @@ void ObjectManager::AddUndestroyable(GameObject* gameObject) {
 }
 
 void ObjectManager::DestroyObject(GameObject* gameObject) {
+	if (!gameObject->isEnabled)
+		return;
+
 	destroyed.push_back(gameObject);
 	gameObject->isEnabled = false;
 }

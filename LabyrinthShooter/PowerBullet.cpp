@@ -2,7 +2,7 @@
 
 PowerBullet::PowerBullet(GameObject& owner, float speed)
 	: Bullet(owner, speed), health(POWER_BULLET_HEALTH) {
-
+	gameObject.isStatic = true;
 }
 
 ObjectComponent* PowerBullet::Copy(GameObject& newOwner) {
@@ -10,11 +10,10 @@ ObjectComponent* PowerBullet::Copy(GameObject& newOwner) {
 }
 
 void PowerBullet::OnCollision(GameObject& collider) {
-	// TODO: sprawiæ, aby nie odbija³ siê od obiektów
 	if (collider.isDestroyable) {
 		collider.SetDestroyed(true);
 
-		DecreaseHealth();
+		DecreaseHealth(); // TODO: zamieniæ na zmniejszanie si³y wraz z przebytym dystansem
 	}
 	else {
 		Bullet::OnCollision(collider);

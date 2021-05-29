@@ -19,6 +19,7 @@ public:
 	bool isDestroyable = false;
 
 	std::function<void(GameObject& collider)> onCollision;
+	std::function<void()> onDestroyed;
 public:
 	GameObject(const std::list<GameObject*>& allObjects);
 	GameObject(const Vector& size, const std::list<GameObject*>& allObjects);
@@ -42,6 +43,7 @@ public:
 	bool CollidesWithAny() const;
 
 	void SetDestroyed(bool destroyed);
+	bool IsDestroyed() const;
 
 	void SetPosition(const Vector& newPosition);
 	void Translate(const Vector& offset); // przesuniêcie

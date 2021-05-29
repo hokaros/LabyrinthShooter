@@ -192,6 +192,14 @@ bool GameObject::CollidesWithAny() const {
 
 void GameObject::SetDestroyed(bool destroyed) {
 	isEnabled = !destroyed;
+
+	if (destroyed && onDestroyed) {
+		onDestroyed();
+	}
+}
+
+bool GameObject::IsDestroyed() const {
+	return !isEnabled;
 }
 
 bool GameObject::DoesIntersect(const GameObject& other) const {

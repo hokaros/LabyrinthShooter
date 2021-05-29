@@ -118,6 +118,7 @@ GameObject* LabyrinthSolidifier::BuildWall(const Vector& size, int color) {
 	GameObject* wall = new GameObject(size, allObjects);
 
 	wall->AddComponent(new RectangleRenderer(*wall, Window::Main()->GetScreen(), color, color));
+	wall->AddComponent(new Regenerable(*wall, WALL_REGEN));
 	wall->isStatic = true;
 
 	return wall;
