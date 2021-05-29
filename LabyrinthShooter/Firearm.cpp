@@ -21,8 +21,13 @@ void Firearm::Shoot() {
 	ObjectManager::Main()->AddObject(bullet);
 
 	// Ustawienie pozycji
-	bullet->SetPosition(gameObject.GetPosition() + Vector(Direction::EAST) * gameObject.GetSize().x);
-	// TODO: obrócenie pocisku zgodnie z obrotem broni
+	Vector relativePos = Vector(Direction::EAST) * gameObject.GetSize().x;
+	bullet->SetPosition(gameObject.LocalToWorld(relativePos));
+	// Obrót zgodnie z obrotem broni
+	bullet->Rotate(gameObject.GetRotation());
+
+	// Nadanie kierunku lotu
+	bullet->FindComponent<Bullet>()->SetDirection(gameObject.LookingDirection());
 }
 
 ObjectComponent* Firearm::Copy(GameObject& newOwner) {

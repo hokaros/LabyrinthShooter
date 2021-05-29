@@ -2,6 +2,7 @@
 #include "ObjectComponent.h"
 #include "InputController.h"
 #include "ObjectManager.h"
+#include "Bullet.h"
 
 #define SHOOT_KEY SDLK_SPACE
 

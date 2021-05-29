@@ -10,10 +10,13 @@ public:
 	Bullet(GameObject& owner, float speed);
 	void Update() override;
 
+	void SetDirection(const Vector& direction);
+
 	ObjectComponent* Copy(GameObject& newOwner) override;
 protected:
 	virtual void OnCollision(GameObject& collider);
 private:
 	float speed;
+	Vector direction;
 };
 

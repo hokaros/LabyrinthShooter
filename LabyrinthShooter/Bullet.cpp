@@ -1,7 +1,7 @@
 #include "Bullet.h"
 
 Bullet::Bullet(GameObject& owner, float speed)
-	: ObjectComponent(owner), speed(speed) {
+	: ObjectComponent(owner), speed(speed), direction(Direction::EAST) {
 
 	owner.onCollision =
 		[this](GameObject& collider) {
@@ -11,7 +11,7 @@ Bullet::Bullet(GameObject& owner, float speed)
 
 void Bullet::Update() {
 	gameObject.Translate(
-		Vector(Direction::EAST) * speed * Timer::Main()->GetDeltaTime()
+		direction * speed * Timer::Main()->GetDeltaTime()
 	);
 }
 
@@ -23,4 +23,9 @@ void Bullet::OnCollision(GameObject& collider) {
 
 ObjectComponent* Bullet::Copy(GameObject& newOwner) {
 	return new Bullet(newOwner, speed);
+}
+
+void Bullet::SetDirection(const Vector& direction) {
+	this->direction = Vector(direction);
+	this->direction.Normalize();
 }

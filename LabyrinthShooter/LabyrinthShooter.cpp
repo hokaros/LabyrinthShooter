@@ -37,6 +37,11 @@ int main()
 		printf("Nie udalo sie zaladowac resources/player.bmp\n");
 		return 1;
 	}
+	SDL_Surface* wpnPrimaryBmp = SDL_LoadBMP("resources/weapon_primary.bmp");
+	if (wpnPrimaryBmp == NULL) {
+		printf("Nie udalo sie zaladowac resources/weapon_primary.bmp\n");
+		return 1;
+	}
 
 	int black = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
 	int red = SDL_MapRGB(screen->format, 0xFF, 0x00, 0x00);
@@ -77,12 +82,13 @@ int main()
 	basicBullet.AddComponent(new RectangleRenderer(basicBullet, screen, red, red));
 	// Broń
 	GameObject* basicWeapon = new GameObject(
-		Vector(20, 4),
+		Vector(30, 10),
 		player->GetPosition() + Vector(Direction::EAST) * player->GetSize().x,
 		objectManager.GetAllObjects()
 	);
 	basicWeapon->AddComponent(new Firearm(*basicWeapon, basicBullet, WPN_BASIC_RELOAD));
-	basicWeapon->AddComponent(new RectangleRenderer(*basicWeapon, screen, blue, blue));
+	basicWeapon->AddComponent(new SpriteRenderer(*basicWeapon, screen, wpnPrimaryBmp));
+	//basicWeapon->AddComponent(new RectangleRenderer(*basicWeapon, screen, blue, blue));
 	basicWeapon->collisionEnabled = false;
 
 	player->AddChild(basicWeapon);

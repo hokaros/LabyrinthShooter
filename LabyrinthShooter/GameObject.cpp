@@ -60,6 +60,13 @@ double GameObject::GetRotation() const {
 	return rotation;
 }
 
+Vector GameObject::LookingDirection() const {
+	return Vector(
+		cos(rotation * M_PI / 180),
+		sin(rotation * M_PI / 180)
+	);
+}
+
 const Vector& GameObject::GetPosition() const {
 	return position;
 }
@@ -130,6 +137,20 @@ void GameObject::LookAt(const Vector& point) {
 
 	double dRot = lookRotation - rotation;
 	Rotate(dRot);
+}
+
+Vector GameObject::LocalToWorld(const Vector& localPos) const {
+	Vector fromMid = localPos - size / 2;
+	double radius = fromMid.Length();
+
+	double localAngle = atan2(fromMid.y, fromMid.x) * 180 / M_PI;
+	double targetAngle = localAngle - rotation;
+
+	Vector unrotatedPos(
+		cos(targetAngle * M_PI / 180) * radius,
+		sin(targetAngle * M_PI / 180) * radius
+	);
+	return unrotatedPos + position + size/2;
 }
 
 void GameObject::AddChild(GameObject* child) {
