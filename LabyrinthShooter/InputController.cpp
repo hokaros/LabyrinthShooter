@@ -7,7 +7,11 @@ InputController* InputController::Main() {
 }
 
 InputController::InputController(SDL_KeyCode* managedKeys, size_t keysCount)
-	: keysCount(keysCount), managedKeys(new SDL_KeyCode[keysCount]), keyDownInfo(new bool[keysCount]) {
+	: keysCount(keysCount),
+	managedKeys(new SDL_KeyCode[keysCount]),
+	keyDownInfo(new bool[keysCount]),
+	pressedThisFrame(new bool[keysCount]) {
+
 	if (main == NULL) {
 		main = this;
 	}
@@ -16,6 +20,7 @@ InputController::InputController(SDL_KeyCode* managedKeys, size_t keysCount)
 	std::memcpy(this->managedKeys, managedKeys, keysCount * sizeof(SDL_KeyCode));
 	for (size_t i = 0; i < keysCount; i++) {
 		keyDownInfo[i] = false;
+		pressedThisFrame[i] = false;
 	}
 }
 
@@ -29,6 +34,8 @@ InputController::~InputController() {
 }
 
 bool InputController::Update() {
+	ClearFrameInfo();
+
 	SDL_Event event;
 	bool quit = false;
 
@@ -43,6 +50,7 @@ bool InputController::Update() {
 			if (event.key.keysym.sym == managedKeys[i]) {
 				if (event.type == SDL_KEYDOWN) {
 					keyDownInfo[i] = true;
+					pressedThisFrame[i] = true;
 				}
 				else if (event.type == SDL_KEYUP) {
 					keyDownInfo[i] = false;
@@ -55,13 +63,19 @@ bool InputController::Update() {
 }
 
 bool InputController::IsKeyDown(SDL_KeyCode key) const {
-	for (size_t i = 0; i < keysCount; i++) {
-		if (managedKeys[i] == key) {
-			return keyDownInfo[i];
-		}
-	}
+	int index = KeyIndex(key);
+	if (index < 0)
+		return false; // nie nale퓓 do zarz퉐zanych klawiszy
 
-	return false; // nie nale퓓 do zarz퉐zanych klawiszy
+	return keyDownInfo[index];
+}
+
+bool InputController::PressedThisFrame(SDL_KeyCode key) const {
+	int index = KeyIndex(key);
+	if (index < 0)
+		return false;
+
+	return pressedThisFrame[index];
 }
 
 Vector InputController::GetMousePosition() const {
@@ -69,4 +83,20 @@ Vector InputController::GetMousePosition() const {
 	SDL_GetMouseState(&x, &y);
 
 	return Vector(x, y);
+}
+
+int InputController::KeyIndex(SDL_KeyCode key) const {
+	for (size_t i = 0; i < keysCount; i++) {
+		if (managedKeys[i] == key) {
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+void InputController::ClearFrameInfo() {
+	for (size_t i = 0; i < keysCount; i++) {
+		pressedThisFrame[i] = false;
+	}
 }

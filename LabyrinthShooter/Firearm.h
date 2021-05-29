@@ -20,6 +20,8 @@ protected:
 private:
 	float reloadTime;
 	float timeSinceLastShot = INFINITY;
+
+	bool isReloaded = true; // czy gotowy do strza³u
 private:
 	void Shoot();
 };

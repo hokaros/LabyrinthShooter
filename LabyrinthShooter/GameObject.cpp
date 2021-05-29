@@ -45,11 +45,23 @@ void GameObject::AddComponent(IUpdateable* component) {
 }
 
 void GameObject::Update() {
+	if (!isEnabled)
+		return;
+
 	for (IUpdateable* component : components) {
 		component->Update();
 	}
 
 	HandleCollisions();
+}
+
+void GameObject::Start() {
+	if (!isEnabled)
+		return;
+
+	for (IUpdateable* component : components) {
+		component->Start();
+	}
 }
 
 const Vector& GameObject::GetSize() const {
@@ -198,8 +210,16 @@ void GameObject::SetDestroyed(bool destroyed) {
 	}
 }
 
+void GameObject::SetEnabled(bool enabled) {
+	isEnabled = enabled;
+}
+
 bool GameObject::IsDestroyed() const {
 	return !isEnabled;
+}
+
+bool GameObject::IsEnabled() const {
+	return isEnabled;
 }
 
 bool GameObject::DoesIntersect(const GameObject& other) const {

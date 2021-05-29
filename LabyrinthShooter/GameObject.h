@@ -11,7 +11,6 @@
 class GameObject
 {
 public:
-	bool isEnabled = true;
 	// Czy obiekt ignoruje dzia³aj¹ce na niego si³y
 	bool isStatic = false;
 	bool collisionEnabled = true;
@@ -33,6 +32,8 @@ public:
 
 	// Raz na klatkê
 	void Update();
+	// Na pocz¹tku gry
+	void Start();
 
 	const Vector& GetPosition() const;
 	const Vector& GetSize() const;
@@ -43,7 +44,9 @@ public:
 	bool CollidesWithAny() const;
 
 	void SetDestroyed(bool destroyed);
+	void SetEnabled(bool enabled);
 	bool IsDestroyed() const;
+	bool IsEnabled() const;
 
 	void SetPosition(const Vector& newPosition);
 	void Translate(const Vector& offset); // przesuniêcie
@@ -63,6 +66,8 @@ protected:
 
 	bool insideOutCollision = false;
 private:
+	bool isEnabled = true;
+
 	Vector size;
 	Vector position;
 	double rotation = 0.0;
@@ -91,7 +96,7 @@ private:
 template<class T>
 T* GameObject::FindComponent() {
 	for (IUpdateable* component : components) {
-		T* desired = static_cast<T*>(component);
+		T* desired = dynamic_cast<T*>(component);
 		if (desired != NULL) {
 			return desired;
 		}

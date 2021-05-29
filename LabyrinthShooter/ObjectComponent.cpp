@@ -4,6 +4,10 @@ ObjectComponent::ObjectComponent(GameObject& owner)
 
 }
 
+GameObject& ObjectComponent::GetOwner() const {
+	return gameObject;
+}
+
 IUpdateable* ObjectComponent::Copy() {
 	return Copy(gameObject);
 }

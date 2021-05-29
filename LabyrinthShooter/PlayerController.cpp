@@ -5,9 +5,19 @@ PlayerController::PlayerController(GameObject& player, float movementSpeed)
 
 }
 
+void PlayerController::Start() {
+	// Za³adowanie cache'a
+	input = InputController::Main();
+	equipment = gameObject.FindComponent<PlayerEquipment>();
+}
+
 void PlayerController::Update() {
 	ProcessMovement();
 	ProcessAim();
+
+	if (input->PressedThisFrame(WPN_SWITCH_KEY)) {
+		equipment->SwitchWeapon();
+	}
 }
 
 ObjectComponent* PlayerController::Copy(GameObject& newOwner) {
@@ -15,8 +25,6 @@ ObjectComponent* PlayerController::Copy(GameObject& newOwner) {
 }
 
 void PlayerController::ProcessMovement() {
-	InputController* input = InputController::Main();
-
 	// Odczytanie wciœniêtych klawiszy
 	Vector moveDir;
 	if (input->IsKeyDown(SDLK_UP) || input->IsKeyDown(SDLK_w)) {
@@ -39,8 +47,6 @@ void PlayerController::ProcessMovement() {
 }
 
 void PlayerController::ProcessAim() {
-	InputController* input = InputController::Main();
-
 	Vector mousePos = input->GetMousePosition();
 
 	gameObject.LookAt(mousePos);

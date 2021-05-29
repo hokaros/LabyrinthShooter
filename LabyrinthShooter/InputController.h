@@ -11,6 +11,7 @@ public:
 	// Aktualizuje statusy klawiszy. Zwraca false, jeœli zamkniêto okno
 	bool Update();
 	bool IsKeyDown(SDL_KeyCode key) const;
+	bool PressedThisFrame(SDL_KeyCode key) const;
 
 	Vector GetMousePosition() const;
 
@@ -19,7 +20,12 @@ private:
 	size_t keysCount;
 	SDL_KeyCode* managedKeys;
 	bool* keyDownInfo;
+	bool* pressedThisFrame;
 
 	static InputController* main;
+
+private:
+	int KeyIndex(SDL_KeyCode key) const;
+	void ClearFrameInfo();
 };
 

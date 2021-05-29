@@ -3,15 +3,20 @@
 Firearm::Firearm(GameObject& owner, const GameObject& bulletPrefab, float reloadTime)
 	: ObjectComponent(owner), bulletPrefab(bulletPrefab), reloadTime(reloadTime) {
 
+	gameObject.collisionEnabled = false;
 }
 
 void Firearm::Update() {
-	if (InputController::Main()->IsKeyDown(SHOOT_KEY) && timeSinceLastShot >= reloadTime) {
-		Shoot();
-		timeSinceLastShot = 0.0f;
+	timeSinceLastShot += Timer::Main()->GetDeltaTime();
+	if (timeSinceLastShot >= reloadTime) {
+		isReloaded = true;
 	}
 
-	timeSinceLastShot += Timer::Main()->GetDeltaTime();
+	if (InputController::Main()->IsKeyDown(SHOOT_KEY) && isReloaded) {
+		Shoot();
+		timeSinceLastShot = 0.0f;
+		isReloaded = false;
+	}
 }
 
 void Firearm::Shoot() {
