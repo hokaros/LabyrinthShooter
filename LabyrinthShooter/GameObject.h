@@ -12,8 +12,11 @@ class GameObject
 {
 public:
 	bool isEnabled = true;
+	// Czy obiekt ignoruje dzia³aj¹ce na niego si³y
 	bool isStatic = false;
 	bool collisionEnabled = true;
+	// Czy obiekt mo¿e byæ niszczony przez pociski
+	bool isDestroyable = false;
 
 	std::function<void(GameObject& collider)> onCollision;
 public:
@@ -37,6 +40,8 @@ public:
 	Vector GetMiddle() const;
 	bool Collides(const GameObject& other) const;
 	bool CollidesWithAny() const;
+
+	void SetDestroyed(bool destroyed);
 
 	void SetPosition(const Vector& newPosition);
 	void Translate(const Vector& offset); // przesuniêcie

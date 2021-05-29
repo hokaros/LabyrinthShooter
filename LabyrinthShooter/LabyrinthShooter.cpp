@@ -16,6 +16,7 @@
 #include "LabyrinthSolidifier.h"
 #include "ObjectManager.h"
 #include "Bullet.h"
+#include "PowerBullet.h"
 #include "Firearm.h"
 
 #define SCREEN_WIDTH 800
@@ -78,7 +79,7 @@ int main()
 		Vector(4, 4),
 		objectManager.GetAllObjects()
 	);
-	basicBullet.AddComponent(new Bullet(basicBullet, BULLET_SPEED));
+	basicBullet.AddComponent(new PowerBullet(basicBullet, BULLET_SPEED));
 	basicBullet.AddComponent(new RectangleRenderer(basicBullet, screen, red, red));
 	// Broń
 	GameObject* basicWeapon = new GameObject(

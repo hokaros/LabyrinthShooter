@@ -12,11 +12,12 @@ public:
 
 	void SetDirection(const Vector& direction);
 
-	ObjectComponent* Copy(GameObject& newOwner) override;
+	virtual ObjectComponent* Copy(GameObject& newOwner) override;
+protected:
+	float speed;
 protected:
 	virtual void OnCollision(GameObject& collider);
 private:
-	float speed;
 	Vector direction;
 };
 

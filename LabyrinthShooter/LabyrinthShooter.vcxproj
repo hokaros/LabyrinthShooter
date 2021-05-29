@@ -32,6 +32,7 @@
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="ObjectRenderer.h" />
     <ClInclude Include="PlayerController.h" />
+    <ClInclude Include="PowerBullet.h" />
     <ClInclude Include="RectangleRenderer.h" />
     <ClInclude Include="SpriteRenderer.h" />
     <ClInclude Include="Timer.h" />
@@ -52,6 +53,7 @@
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="ObjectRenderer.cpp" />
     <ClCompile Include="PlayerController.cpp" />
+    <ClCompile Include="PowerBullet.cpp" />
     <ClCompile Include="RectangleRenderer.cpp" />
     <ClCompile Include="SpriteRenderer.cpp" />
     <ClCompile Include="Timer.cpp" />

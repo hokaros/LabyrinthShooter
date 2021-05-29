@@ -19,6 +19,7 @@ LabyrinthSolidifier::LabyrinthSolidifier(const Vector& pos,
 	walls = new GameObject * [labyrinth.ActiveCount()];
 	for (int i = 0; i < labyrinth.ActiveCount(); i++) {
 		walls[i] = BuildWall(Vector(wallWidth, wallLength));
+		walls[i]->isDestroyable = true;
 	}
 
 	PlaceWalls(); // wstawienie œcian w odpowiednie miejsca

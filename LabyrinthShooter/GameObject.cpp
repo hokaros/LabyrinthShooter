@@ -190,6 +190,10 @@ bool GameObject::CollidesWithAny() const {
 	return false;
 }
 
+void GameObject::SetDestroyed(bool destroyed) {
+	isEnabled = !destroyed;
+}
+
 bool GameObject::DoesIntersect(const GameObject& other) const {
 	float yMin1 = position.y;
 	float yMax1 = yMin1 + size.y;
@@ -278,7 +282,7 @@ Vector GameObject::LinesIntersection(float min1, float max1, float min2, float m
 
 void GameObject::HandleCollisions() {
 	for (GameObject* go : allObjects) {
-		if (go == this || go->isStatic || !go->isEnabled)
+		if (go == this || !go->isEnabled)
 			continue;
 
 		if (Collides(*go)) {
@@ -289,7 +293,9 @@ void GameObject::HandleCollisions() {
 				go->onCollision(*this);
 			}
 
-			BumpOut(*go);
+			if (!go->isStatic) {
+				BumpOut(*go);
+			}
 		}
 	}
 }
