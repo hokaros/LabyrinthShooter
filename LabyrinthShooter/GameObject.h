@@ -58,6 +58,7 @@ public:
 	Vector LocalToWorld(const Vector& localPos) const;
 
 	void AddChild(GameObject* child);
+	const std::list<GameObject*>& GetChildren() const;
 
 
 	~GameObject();

@@ -13,10 +13,6 @@ ObjectComponent* PlayerEquipment::Copy(GameObject& newOwner) {
 	return new PlayerEquipment(newOwner, basicWpn, superWpn);
 }
 
-void PlayerEquipment::Update() {
-
-}
-
 void PlayerEquipment::EquipWeapon(WeaponType weaponType) {
 	if (weaponType == WeaponType::Basic) {
 		EquipWeapon(basicWpn);
@@ -42,4 +38,11 @@ void PlayerEquipment::EquipWeapon(GameObject* wpn) {
 	}
 
 	currWpn = wpn;
+}
+
+Firearm* PlayerEquipment::GetCurrentWeapon() {
+	if (currWpn == NULL)
+		return NULL;
+
+	return currWpn->FindComponent<Firearm>();
 }

@@ -2,8 +2,10 @@
 #include "ObjectComponent.h"
 #include "InputController.h"
 #include "PlayerEquipment.h"
+#include "Firearm.h"
 
 #define WPN_SWITCH_KEY SDLK_q
+#define SHOOT_KEY SDLK_SPACE
 
 class PlayerController :
 	public ObjectComponent

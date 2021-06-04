@@ -15,10 +15,10 @@
 #include "Window.h"
 #include "LabyrinthSolidifier.h"
 #include "ObjectManager.h"
-#include "Bullet.h"
 #include "PowerBullet.h"
-#include "Firearm.h"
 #include "PlayerEquipment.h"
+#include "Firearm.h"
+#include "Health.h"
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
@@ -28,6 +28,8 @@
 #define BULLET_SUPER_SPEED 2000
 #define WPN_BASIC_RELOAD 0.2
 #define WPN_SUPER_RELOAD 2
+
+#define MAX_HEALTH 3
 
 int main()
 {
@@ -125,7 +127,15 @@ int main()
 
 	// Ekwipunek
 	player->AddComponent(new PlayerEquipment(*player, basicWeapon, superWeapon));
-
+	// Zdrowie
+	Health* playerHealth = new Health(*player, MAX_HEALTH);
+	player->AddComponent(playerHealth);
+	playerHealth->SubscribeDeath(
+		[&](Health* deadPlayer) {
+			printf("Dead\n");
+			objectManager.DestroyObject(&(deadPlayer->GetOwner()));
+		}
+	);
 
 
 

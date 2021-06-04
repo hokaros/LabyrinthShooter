@@ -4,8 +4,6 @@
 #include "ObjectManager.h"
 #include "Bullet.h"
 
-#define SHOOT_KEY SDLK_SPACE
-
 class Firearm :
 	public ObjectComponent
 {
@@ -13,6 +11,8 @@ public:
 	Firearm(GameObject& owner, const GameObject& bulletPrefab, float reloadTime);
 
 	void Update() override;
+	// Strzela, jeœli prze³adowano
+	void TryShoot();
 
 	ObjectComponent* Copy(GameObject& newOwner) override;
 protected:
@@ -22,7 +22,5 @@ private:
 	float timeSinceLastShot = INFINITY;
 
 	bool isReloaded = true; // czy gotowy do strza³u
-private:
-	void Shoot();
 };
 

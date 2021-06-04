@@ -14,7 +14,7 @@ public:
 	void EquipWeapon(WeaponType weaponType);
 	void SwitchWeapon();
 
-	virtual void Update() override;
+	Firearm* GetCurrentWeapon();
 
 	ObjectComponent* Copy(GameObject& newOwner) override;
 

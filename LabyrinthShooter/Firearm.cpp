@@ -11,15 +11,12 @@ void Firearm::Update() {
 	if (timeSinceLastShot >= reloadTime) {
 		isReloaded = true;
 	}
-
-	if (InputController::Main()->IsKeyDown(SHOOT_KEY) && isReloaded) {
-		Shoot();
-		timeSinceLastShot = 0.0f;
-		isReloaded = false;
-	}
 }
 
-void Firearm::Shoot() {
+void Firearm::TryShoot() {
+	if (!isReloaded)
+		return;
+
 	// Stworzenie pocisku
 	GameObject* bullet = new GameObject(bulletPrefab);
 
@@ -33,6 +30,10 @@ void Firearm::Shoot() {
 
 	// Nadanie kierunku lotu
 	bullet->FindComponent<Bullet>()->SetDirection(gameObject.LookingDirection());
+
+	// Aktualizacja info o prze³adowaniu
+	timeSinceLastShot = 0.0f;
+	isReloaded = false;
 }
 
 ObjectComponent* Firearm::Copy(GameObject& newOwner) {

@@ -24,6 +24,7 @@
     <ClInclude Include="Draw.h" />
     <ClInclude Include="Firearm.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Health.h" />
     <ClInclude Include="InputController.h" />
     <ClInclude Include="IUpdateable.h" />
     <ClInclude Include="Labirynt.h" />
@@ -47,6 +48,7 @@
     <ClCompile Include="Draw.cpp" />
     <ClCompile Include="Firearm.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Health.cpp" />
     <ClCompile Include="InputController.cpp" />
     <ClCompile Include="Labirynt.cpp" />
     <ClCompile Include="LabyrinthShooter.cpp" />

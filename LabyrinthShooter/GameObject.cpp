@@ -171,6 +171,10 @@ void GameObject::AddChild(GameObject* child) {
 	children.push_back(child);
 }
 
+const std::list<GameObject*>& GameObject::GetChildren() const {
+	return children;
+}
+
 bool GameObject::Collides(const GameObject& other) const {
 	if (!collisionEnabled || !other.collisionEnabled)
 		return false;
@@ -212,6 +216,10 @@ void GameObject::SetDestroyed(bool destroyed) {
 
 void GameObject::SetEnabled(bool enabled) {
 	isEnabled = enabled;
+
+	for (GameObject* child : children) {
+		child->SetEnabled(enabled);
+	}
 }
 
 bool GameObject::IsDestroyed() const {
