@@ -1,4 +1,5 @@
 #include "Vector.h"
+#include <SDL_stdinc.h>
 
 Vector::Vector()
 	: x(0), y(0) {
@@ -52,6 +53,20 @@ void Vector::Sort() {
 	float helper = x;
 	x = y;
 	y = x;
+}
+
+void Vector::Rotate(float angle) {
+	float length = Length();
+
+	float currAngle = GetAngle();
+	float targetAngle = currAngle + angle;
+
+	x = cos(targetAngle) * length;
+	y = sin(targetAngle) * length;
+}
+
+float Vector::GetAngle() const {
+	return atan2(y, x);
 }
 
 float Vector::Length() const {

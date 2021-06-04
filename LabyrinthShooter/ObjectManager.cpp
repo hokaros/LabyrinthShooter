@@ -26,23 +26,34 @@ void ObjectManager::AddObject(GameObject* gameObject) {
 	allObjects.push_back(gameObject);
 
 	destroyables.push_back(gameObject);
+
+	// Rekursywne dodanie dzieci
+	for (GameObject* child : gameObject->GetChildren()) {
+		AddObject(child);
+	}
 }
 
 void ObjectManager::AddUndestroyable(GameObject* gameObject) {
 	allObjects.push_back(gameObject);
 }
 
-void ObjectManager::DestroyObject(GameObject* gameObject) {
+void ObjectManager::DestroyObject(GameObject* gameObject, bool detach) {
 	for (GameObject* destroyedObj : destroyed) {
 		if (destroyedObj == gameObject)
 			return;  // ju¿ usuniêty
 	}
 
-	destroyed.push_back(gameObject);
+	destroyed.push_back(gameObject); // zakolejkowanie do usuniêcia
 	gameObject->SetEnabled(false);
 
+	// Od³¹czenie od rodzica
+	if (detach && gameObject->GetParent() != NULL) {
+		gameObject->GetParent()->RemoveChild(gameObject);
+	}
+
+	// Usuniêcie rekurencyjne dzieci
 	for (GameObject* child : gameObject->GetChildren()) {
-		DestroyObject(child);
+		DestroyObject(child, false);
 	}
 }
 

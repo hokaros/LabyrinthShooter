@@ -25,11 +25,6 @@ void PlayerController::Update() {
 	if (input->IsKeyDown(SHOOT_KEY) && equipment->GetCurrentWeapon() != NULL) {
 		equipment->GetCurrentWeapon()->TryShoot();
 	}
-
-	// XD
-	if (input->PressedThisFrame(SDLK_s)) {
-		gameObject.FindComponent<Health>()->Hurt(1);
-	}
 }
 
 ObjectComponent* PlayerController::Copy(GameObject& newOwner) {

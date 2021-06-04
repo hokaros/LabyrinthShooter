@@ -7,7 +7,12 @@ Health::Health(GameObject& owner, int maxHealth)
 
 ObjectComponent* Health::Copy(GameObject& newOwner)
 {
-	return new Health(newOwner, maxHealth);
+	Health* health = new Health(newOwner, maxHealth);
+	// Dodanie funkcji obs³ugi œmierci
+	for (function<void(Health*)> deathHandler : onDeath) {
+		health->SubscribeDeath(deathHandler);
+	}
+	return health;
 }
 
 void Health::Hurt(int hp) {

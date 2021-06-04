@@ -25,7 +25,9 @@
 #define LAB_TIME 0.5
 
 #define BULLET_BASIC_SPEED 1000
+#define BULLET_BASIC_DAMAGE 1
 #define BULLET_SUPER_SPEED 2000
+#define BULLET_SUPER_DAMAGE 2
 #define WPN_BASIC_RELOAD 0.2
 #define WPN_SUPER_RELOAD 2
 
@@ -38,6 +40,7 @@ int main()
 		return 1;
 
 	SDL_Surface* screen = window.GetScreen();
+	// TODO: przenieść do jednej struktury
 	SDL_Surface* playerBmp = SDL_LoadBMP("resources/player.bmp");
 	if (playerBmp == NULL) {
 		printf("Nie udalo sie zaladowac resources/player.bmp\n");
@@ -93,7 +96,7 @@ int main()
 		Vector(4, 4),
 		objectManager.GetAllObjects()
 	);
-	basicBullet.AddComponent(new Bullet(basicBullet, BULLET_BASIC_SPEED));
+	basicBullet.AddComponent(new Bullet(basicBullet, BULLET_BASIC_SPEED, BULLET_BASIC_DAMAGE));
 	basicBullet.AddComponent(new RectangleRenderer(basicBullet, screen, yellow, yellow));
 
 	// Prefab silnego pocisku
@@ -101,7 +104,7 @@ int main()
 		Vector(10, 10),
 		objectManager.GetAllObjects()
 	);
-	superBullet.AddComponent(new PowerBullet(superBullet, BULLET_SUPER_SPEED));
+	superBullet.AddComponent(new PowerBullet(superBullet, BULLET_SUPER_SPEED, BULLET_SUPER_DAMAGE));
 	superBullet.AddComponent(new RectangleRenderer(superBullet, screen, red, red));
 
 	// Broń
@@ -110,7 +113,7 @@ int main()
 		player->GetPosition() + Vector(Direction::EAST) * player->GetSize().x,
 		objectManager.GetAllObjects()
 	);
-	basicWeapon->AddComponent(new Firearm(*basicWeapon, basicBullet, WPN_BASIC_RELOAD));
+	basicWeapon->AddComponent(new Firearm(*basicWeapon, basicBullet, WPN_BASIC_RELOAD, FirearmType::Basic));
 	basicWeapon->AddComponent(new SpriteRenderer(*basicWeapon, screen, wpnPrimaryBmp));
 	player->AddChild(basicWeapon);
 	objectManager.AddObject(basicWeapon);
@@ -120,13 +123,13 @@ int main()
 		player->GetPosition() + Vector(Direction::EAST) * player->GetSize().x,
 		objectManager.GetAllObjects()
 	);
-	superWeapon->AddComponent(new Firearm(*superWeapon, superBullet, WPN_SUPER_RELOAD));
+	superWeapon->AddComponent(new Firearm(*superWeapon, superBullet, WPN_SUPER_RELOAD, FirearmType::Super));
 	superWeapon->AddComponent(new SpriteRenderer(*superWeapon, screen, wpnSuperBmp));
 	player->AddChild(superWeapon);
 	objectManager.AddObject(superWeapon);
 
 	// Ekwipunek
-	player->AddComponent(new PlayerEquipment(*player, basicWeapon, superWeapon));
+	player->AddComponent(new PlayerEquipment(*player));
 	// Zdrowie
 	Health* playerHealth = new Health(*player, MAX_HEALTH);
 	player->AddComponent(playerHealth);
@@ -136,6 +139,11 @@ int main()
 			objectManager.DestroyObject(&(deadPlayer->GetOwner()));
 		}
 	);
+
+	GameObject* player2 = new GameObject(*player);
+	player2->SetPosition(Vector(130, 250));
+	objectManager.AddObject(player2);
+
 
 
 

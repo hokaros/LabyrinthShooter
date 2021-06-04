@@ -1,7 +1,7 @@
 #include "Firearm.h"
 
-Firearm::Firearm(GameObject& owner, const GameObject& bulletPrefab, float reloadTime)
-	: ObjectComponent(owner), bulletPrefab(bulletPrefab), reloadTime(reloadTime) {
+Firearm::Firearm(GameObject& owner, const GameObject& bulletPrefab, float reloadTime, FirearmType type)
+	: ObjectComponent(owner), bulletPrefab(bulletPrefab), reloadTime(reloadTime), type(type) {
 
 	gameObject.collisionEnabled = false;
 }
@@ -37,5 +37,9 @@ void Firearm::TryShoot() {
 }
 
 ObjectComponent* Firearm::Copy(GameObject& newOwner) {
-	return new Firearm(newOwner, bulletPrefab, reloadTime);
+	return new Firearm(newOwner, bulletPrefab, reloadTime, type);
+}
+
+FirearmType Firearm::GetType() const {
+	return type;
 }

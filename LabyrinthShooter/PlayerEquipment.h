@@ -9,7 +9,9 @@ class PlayerEquipment :
 	public ObjectComponent
 {
 public:
-	PlayerEquipment(GameObject& owner, GameObject* basicWeapon, GameObject* superWeapon);
+	PlayerEquipment(GameObject& owner);
+
+	void Start() override;
 
 	void EquipWeapon(WeaponType weaponType);
 	void SwitchWeapon();
@@ -19,12 +21,13 @@ public:
 	ObjectComponent* Copy(GameObject& newOwner) override;
 
 private:
-	GameObject* basicWpn;
-	GameObject* superWpn;
+	Firearm* basicWpn = NULL;
+	Firearm* superWpn = NULL;
 
-	GameObject* currWpn;
+	Firearm* currWpn = NULL;
 
 private:
-	void EquipWeapon(GameObject* wpn);
+	void EquipWeapon(Firearm* wpn);
+	void LoadWeaponsFromChildren();
 };
 
