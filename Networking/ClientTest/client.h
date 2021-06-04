@@ -11,6 +11,14 @@ public:
 	void Disconnect();
 	bool IsConnected();
 	bool Send(Message<WildMessage>& msg);
+	Message<WildMessage> CreateMessagePlayerDeath(int id);
+	Message<WildMessage> CreateMessageWallDestruction(int x, int y);
+	Message<WildMessage> CreateMessageLabirynthChange(bool* change, int size);
+	Message<WildMessage> CreateMessagePosition(Vector pos, int id);
+	Message<WildMessage> CreateMessageNewDirection(Vector direction, int id);
+	Message<WildMessage> CreateMessageWeaponChange(WeaponType type, int id);
+	Message<WildMessage> CreateMessageChangeOfAimingDirection(float aimDir, int id);
+	Message<WildMessage> CreateMessageJoinRequest();
 	~Client();
 private:
 	asio::io_context context;

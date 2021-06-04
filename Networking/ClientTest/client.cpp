@@ -83,3 +83,66 @@ void Client::OnMessageReceived(const Message<WildMessage>& msg) {
 			onMouseLocked(duration);
 	}
 }
+//Zmiany
+Message<WildMessage> Client::CreateMessagePlayerDeath(int id) {
+
+	Message<WildMessage> message;
+	message.header.id = WildMessage::PLAYER_DEATH;
+	message << id;
+	return message;
+};
+Message<WildMessage> Client::CreateMessageWallDestruction(int x, int y) {
+
+	Message<WildMessage> message;
+	message.header.id = WildMessage::WALL_DESTRUCTION;
+	message << x;
+	message << y;
+	return message;
+};
+Message<WildMessage> Client::CreateMessageLabirynthChange(bool* change, int size) {
+
+	Message<WildMessage> message;
+	message.header.id = WildMessage::LABIRYNTH_CHANGE;
+	for (int i = 0; i < size; i++) {
+		message << change[i];
+	}
+	return message;
+};
+Message<WildMessage> Client::CreateMessagePosition(Vector pos, int id) {
+
+	Message<WildMessage> message;
+	message.header.id = WildMessage::POSITION;
+	message << id;
+	message << pos;
+	return message;
+};
+Message<WildMessage> Client::CreateMessageNewDirection(Vector direction, int id) {
+
+	Message<WildMessage> message;
+	message.header.id = WildMessage::NEW_DIRECTION;
+	message << id;
+	message << direction;
+	return message;
+};
+Message<WildMessage> Client::CreateMessageWeaponChange(WeaponType type, int id) {
+
+	Message<WildMessage> message;
+	message.header.id = WildMessage::WEAPON_CHANGE;
+	message << id;
+	message << type;
+	return message;
+};
+Message<WildMessage> Client::CreateMessageChangeOfAimingDirection(float aimDir, int id) {
+
+	Message<WildMessage> message;
+	message.header.id = WildMessage::CHANGE_OF_AIMING_DIRECTION;
+	message << id;
+	message << aimDir;
+	return message;
+};
+Message<WildMessage> Client::CreateMessageJoinRequest() {
+
+	Message<WildMessage> message;
+	message.header.id = WildMessage::JOIN_REQUEST;
+	return message;
+};
