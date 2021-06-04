@@ -59,6 +59,20 @@ bool Client::IsConnected() {
 	return !disconnected;
 }
 
+bool Client::Send(Message<WildMessage>& msg)
+{
+	if (connectionHandler == NULL) {
+		return false;
+	}
+
+	if (!connectionHandler->IsConnected()) {
+		//onClientDisconnected(connection->GetId());
+		return false;
+	}
+	connectionHandler->WriteMessage(msg);
+	return true;
+}
+
 
 void Client::OnMessageReceived(const Message<WildMessage>& msg) {
 	if (msg.header.id == WildMessage::LOCK_MOUSE) {

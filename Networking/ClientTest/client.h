@@ -1,5 +1,5 @@
 #pragma once
-#include "ConnectionHandler.h"
+#include "../connection/ConnectionHandler.h"
 class Client
 {
 public:
@@ -10,6 +10,7 @@ public:
 	void SendKeys(char* keys, size_t count);
 	void Disconnect();
 	bool IsConnected();
+	bool Send(Message<WildMessage>& msg);
 	~Client();
 private:
 	asio::io_context context;

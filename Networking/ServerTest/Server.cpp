@@ -58,10 +58,23 @@ void Server::Stop() {
 }
 
 void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message) {
-	if (onMessageReceived == NULL)
-		return; //brak subskrybentów
+	WildMessage msgType = message.header.id;
+	Message<WildMessage> msg = message;
 
-	size_t size = message.body.size();
+	switch (msgType)
+	{
+	case WildMessage::WRITE:
+		for (int i = 0; i < 3; i++)
+		{
+			int from_msg;
+			msg >> from_msg;
+			std::cout << "\n" << from_msg << "\n";
+		}
+		break;
+	default: break;
+	}
+
+	/*size_t size = message.body.size();
 	char* str = new char[size + 1];
 	std::memcpy(str, message.body.data(), size);
 	str[size] = '\0';
@@ -69,7 +82,7 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 	std::string stri;
 	stri.append(str);
 
-	onMessageReceived(clientId, stri);
+	onMessageReceived(clientId, stri);*/
 }
 
 void Server::RequestMouseLock(int clientId, int duration) {

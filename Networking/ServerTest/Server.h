@@ -2,7 +2,8 @@
 #include <thread>
 #include <deque>
 
-#include "ConnectionHandler.h"
+#include "../connection/ConnectionHandler.h"
+#include "../connection/Message.h"
 
 #define PORT_DEFAULT 80
 
