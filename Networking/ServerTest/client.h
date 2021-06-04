@@ -1,24 +1,26 @@
 #pragma once
-#include "connectionHandler.h"
+#include "ConnectionHandler.h"
+class Client
+{
+public:
+	void(*onMouseLocked)(int duration);
+public:
+	Client(const char* address, int port);
+	void Connect();
+	void SendKeys(char* keys, size_t count);
+	void Disconnect();
+	bool IsConnected();
+	~Client();
+private:
+	asio::io_context context;
+	asio::io_context::work idleWork;
+	asio::ip::tcp::endpoint endpoint;
+	ConnectionHandler<WildMessage>* connectionHandler;
 
-namespace connection {
-	
-	class Client {
+	std::thread* contextThread;
 
-	public:
-		Client();
-		~Client();
+	bool disconnected = true;
 
-		bool Connect(std::string adress, uint32_t port);
-		void disconnect();
-		void sendMessage(Message& message);
-		bool isConnected();
+	void OnMessageReceived(const Message<WildMessage>& msg);
+};
 
-	protected:
-		connection::ConnectionHandler* connectionHandler = nullptr;
-		std::queue<Message>receivedMessages;
-		std::thread contextThread;
-		asio::io_context context;
-
-	};
-}

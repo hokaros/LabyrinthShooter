@@ -1,48 +1,71 @@
-#include "client.h"
-//#include "connectionHandler.h"
-using namespace connection;
+#include "Client.h"
 
-
-Client::Client() {};
-Client::~Client() {};
-
-bool Client::Connect(std::string adress, uint32_t port) {
-
-	try {
-
-		asio::ip::tcp::resolver resolver(context);
-		asio::ip::tcp::resolver::results_type endpoint = resolver.resolve(adress, std::to_string(port));
-
-		connectionHandler = new ConnectionHandler(context, asio::ip::tcp::socket(context), receivedMessages);
-		connectionHandler->connectToServer(endpoint);
-
-		contextThread = std::thread([this]() { context.run(); });
-
-	}
-	catch (std::exception ex) {
-		std::cout << "[ERROR] An error has occurred in connection with the server";
-		return false;
-	}
-	return true;
+Client::Client(const char* address, int port)
+	: endpoint(asio::ip::make_address(address), port), connectionHandler(NULL),
+	contextThread(NULL), idleWork(context), onMouseLocked(NULL) {
+	
 }
 
-
-void Client::disconnect() {
-
-	if (isConnected()) connectionHandler->disconnect();
-	context.stop();
-	contextThread.join();
+Client::~Client() {
+	Disconnect();
 	delete connectionHandler;
 }
 
-void Client::sendMessage(Message& message) {
-	
-	if (isConnected())
-		connectionHandler->sendMessage(message);
+void Client::Connect() {
+	std::error_code ec;
+	contextThread = new std::thread([&]() {context.run(); });
+
+	asio::ip::tcp::socket socket(context);
+	socket.connect(endpoint, ec);
+	if (ec)
+		return; // b³¹d
+
+	connectionHandler = new ConnectionHandler<WildMessage>(0, context, std::move(socket));
+	connectionHandler->onMessageReceived = [this](int conId, const Message<WildMessage>& msg) {OnMessageReceived(msg); };
+	connectionHandler->OpenInput();
+
+	disconnected = false;
 }
 
-bool Client::isConnected() {
+void Client::SendKeys(char* keys, size_t count) {
+	if (connectionHandler == NULL)
+		return;
 	
-	return connectionHandler == nullptr ? false : connectionHandler->isConnected();
+	Message<WildMessage> message;
+	message.header.id = WildMessage::KEYS;
+
+	for (size_t i = 0; i < count; i++) {
+		message << keys[i];
+	}
+	connectionHandler->WriteMessage(message);
 }
 
+void Client::Disconnect() {
+	context.stop();
+	if (contextThread != NULL && contextThread->joinable()) {
+		contextThread->join();
+		delete contextThread;
+		contextThread = NULL;
+	}
+	if (connectionHandler != NULL) {
+		delete connectionHandler;
+		connectionHandler = NULL;
+	}
+
+	disconnected = true;
+}
+
+bool Client::IsConnected() {
+	return !disconnected;
+}
+
+
+void Client::OnMessageReceived(const Message<WildMessage>& msg) {
+	if (msg.header.id == WildMessage::LOCK_MOUSE) {
+		int duration = 0;
+		std::memcpy(&duration, msg.body.data(), (sizeof(int) <= msg.body.size()) ? sizeof(int) : msg.body.size());
+
+		if (onMouseLocked)
+			onMouseLocked(duration);
+	}
+}

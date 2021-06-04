@@ -1,16 +1,13 @@
 ﻿#include <iostream>
-#include "client.h"
+#include "Client.h"
 
-//using namespace connection;
+Client* client;
+std::thread* clientThread;
 
 int main()
 {
-    std::cout << "Hello World!\n";
-
-	//Client* client = new Client();
-	connection::Client client;
-	client.Connect("51.38.81.49", 80);
-	system("pause");
-
+	std::cout << "Hello World!\n";
+	client = new Client("127.0.0.1", 80);
+	client->Connect();
 	return 0;
 }
