@@ -1,15 +1,14 @@
 #include "connectionHandler.h"
 using namespace connection;
 
-ConnectionHandler::ConnectionHandler(asio::ip::tcp::resolver::results_type& endpoint, asio::io_context& context,
-	asio::ip::tcp::socket socket, std::queue<Message>& messagesIn)
-	:endpoint(endpoint), context(context), socket(std::move(socket)), messagesIn(messagesIn)
+ConnectionHandler::ConnectionHandler(asio::io_context& context, asio::ip::tcp::socket socket, std::queue<Message>& messagesIn)
+	:context(context), socket(std::move(socket)), messagesIn(messagesIn)
 {
 
 }
 
 
-void ConnectionHandler::connectToServer() {
+void ConnectionHandler::connectToServer(asio::ip::tcp::resolver::results_type endpoint) {
 
 	asio::async_connect(socket, endpoint,
 		[this](std::error_code error, asio::ip::tcp::endpoint endpoint)
@@ -22,8 +21,6 @@ void ConnectionHandler::connectToServer() {
 				std::cout << "[ERROR] failed to connect server\n";
 			}
 		});
-
-
 }
 
 
@@ -42,7 +39,7 @@ void ConnectionHandler::sendMessage(Message& message) {
 		//jesli pisze to musimy poczekac, mozna to zrobic rekurencyjnie
 		//jesli kolejka z wiadomosciami do wyslania do serwera zawiera jeakies wiadomosci
 		//nie wywyolujemy funkcji writeHeader, a jedynie dodajemy wiadomosc do kolejki
-		//funckja write header bedzie wywolywana do poki kolejka nie zostanie opró¿niona
+		//funckja write header bedzie wywolywana dopóki kolejka nie zostanie opró¿niona
 
 		bool isWriting = !messagesOut.empty();
 		messagesOut.push(message);
@@ -51,8 +48,6 @@ void ConnectionHandler::sendMessage(Message& message) {
 
 			writeHeader();
 		}
-
-
 		});
 
 }
@@ -63,7 +58,7 @@ void ConnectionHandler::writeHeader() {
 	asio::async_write(socket, asio::buffer(&messagesOut.front().messageHeader, sizeof(messagesOut.front().messageHeader)),
 		[this](std::error_code error, std::size_t size) {
 
-			if (error) {
+			if (!error) {
 
 				if (messagesOut.front().messageBody.size() > 0) {
 					writeBody();
