@@ -2,7 +2,6 @@
 #include "connectionHandler.h"
 
 namespace connection {
-
 	
 	class Client {
 
@@ -15,13 +14,11 @@ namespace connection {
 		void sendMessage(Message& message);
 		bool isConnected();
 
-
 	protected:
 		connection::ConnectionHandler* connectionHandler = nullptr;
 		std::queue<Message>receivedMessages;
 		std::thread contextThread;
 		asio::io_context context;
-		
 
 	};
 }

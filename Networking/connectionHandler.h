@@ -16,15 +16,13 @@
 
 namespace connection {
 
-
 	class ConnectionHandler {
 
 	public:
 
-		ConnectionHandler(asio::ip::tcp::resolver::results_type& endpoint, asio::io_context& context,
-			asio::ip::tcp::socket socket, std::queue<Message>& messagesIn);
+		ConnectionHandler(asio::io_context& context, asio::ip::tcp::socket socket, std::queue<Message>& messagesIn);
 		
-		void connectToServer();
+		void connectToServer(asio::ip::tcp::resolver::results_type);
 		bool isConnected();
 		void sendMessage(Message& message);
 		void writeHeader();
@@ -34,22 +32,12 @@ namespace connection {
 		void saveMessage();
 		void disconnect();
 
-
-
-
-
 	protected:
 		asio::io_context& context;
 		asio::ip::tcp::socket socket;
-		asio::ip::tcp::resolver::results_type& endpoint;
 		std::queue<Message>& messagesIn;
 		std::queue<Message> messagesOut;
 		connection::Message tmpMessage;
 
-
 	};
-
-
-
-
 }
