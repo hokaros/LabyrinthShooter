@@ -3,6 +3,10 @@
 #include "Draw.h"
 #include <mutex>
 
+#define WAITING_FONTSIZE 14
+
+#define NEEDED_PLAYERS 4
+
 class GameRoom
 {
 public:
@@ -13,21 +17,23 @@ public:
 	// Wejœcie do gry
 	void StartGame(int selfId, Vector* playerPositions, size_t playerCount);
 
-	int CountPlayers() const;
+	int GetPlayerCount();
 	void SetPlayerCount(int count);
 
 private:
 	Window& window;
 	InputController input;
-	Game* game; // obecna gra
-	Game* nextGame; // gra przygotowana do uruchomienia
+	Game* game = NULL; // obecna gra
+	Game* nextGame = NULL; // gra przygotowana do uruchomienia
 
 	int playerCount;
 
 	bool startGame = false; // Sygna³ do rozpoczêcia gry
-	std::mutex gameStartMutex;
+	std::mutex mutex;
 
 private:
+	void DrawWaitingRoom();
+
 	// Uruchamia pêtlê gry
 	void RunGame();
 

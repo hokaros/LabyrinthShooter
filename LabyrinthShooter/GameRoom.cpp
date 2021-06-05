@@ -28,27 +28,27 @@ void GameRoom::Enter() {
 			quit = 1;
 		}
 
-		//generowanie t³a
+		// Generowanie t³a
 		SDL_FillRect(screen, NULL, black);
 
 		// Wyœwietlenie poczekalni
-		window.DrawString(0, 0, "Press enter to start the game");
+		DrawWaitingRoom();
 
 		{
 			// Odczytanie zewnêtrznego sygna³u rozpoczêcia
-			std::lock_guard<std::mutex> lock(gameStartMutex);
+			std::lock_guard<std::mutex> lock(mutex);
 			shouldStart = startGame;
 		}
 
 		if (shouldStart) {
 			// Wejœcie do gry
 			RunGame();
-			std::lock_guard<std::mutex> lock(gameStartMutex);
+			std::lock_guard<std::mutex> lock(mutex);
 			startGame = false;
 		}
 
 		if (input.PressedThisFrame(SDLK_RETURN)) {
-			// Wejœcie do gry
+			// Testowe wejœcie do gry
 			size_t pCount = 10;
 			float offset = 80;
 			Vector* playerPositions = new Vector[pCount];
@@ -68,6 +68,15 @@ void GameRoom::Enter() {
 	}
 }
 
+void GameRoom::DrawWaitingRoom() {
+	char buffer[16];
+	// Informacja o liczbie graczy w poczekalni
+	sprintf_s(buffer, "%d/%d", GetPlayerCount(), NEEDED_PLAYERS);
+	window.DrawString(5, 5, buffer, WAITING_FONTSIZE);
+
+	window.DrawString(window.GetWidth()/2 - 15*WAITING_FONTSIZE, window.GetHeight()/2 - WAITING_FONTSIZE, "Press enter to start the game", WAITING_FONTSIZE);
+}
+
 void GameRoom::StartGame(int selfId, Vector* playerPositions, size_t playerCount) {
 	this->playerCount = playerCount;
 
@@ -75,7 +84,7 @@ void GameRoom::StartGame(int selfId, Vector* playerPositions, size_t playerCount
 	std::memcpy(positionsCpy, playerPositions, playerCount);
 	GameStartInfo gameInfo(positionsCpy, playerCount);
 
-	std::lock_guard<std::mutex> lock(gameStartMutex);
+	std::lock_guard<std::mutex> lock(mutex);
 	nextGame = new Game(window, std::move(gameInfo));
 	startGame = true;
 }
@@ -85,7 +94,7 @@ void GameRoom::RunGame() {
 		return;
 
 	{
-		std::lock_guard<std::mutex> lock(gameStartMutex);
+		std::lock_guard<std::mutex> lock(mutex);
 		// Ustawienie przygotowanej gry jako aktualna
 		if (game != NULL) {
 			delete game;
@@ -101,26 +110,30 @@ void GameRoom::RunGame() {
 	game = NULL;
 }
 
-int GameRoom::CountPlayers() const {
+int GameRoom::GetPlayerCount() {
+	std::lock_guard<std::mutex> lock(mutex);
+
 	return playerCount;
 }
 
 void GameRoom::SetPlayerCount(int count) {
+	std::lock_guard<std::mutex> lock(mutex);
+
 	playerCount = count;
 }
 
 void GameRoom::SetShouldStart(bool shouldStart) {
-	std::lock_guard<std::mutex> lock(gameStartMutex);
+	std::lock_guard<std::mutex> lock(mutex);
 
 	startGame = shouldStart;
 }
 
 bool GameRoom::ShouldStart() {
-	std::lock_guard<std::mutex> lock(gameStartMutex);
+	std::lock_guard<std::mutex> lock(mutex);
 	return startGame;
 }
 
 void GameRoom::SetNextGame(Game* newGame) {
-	std::lock_guard<std::mutex> lock(gameStartMutex);
+	std::lock_guard<std::mutex> lock(mutex);
 	nextGame = newGame;
 }
