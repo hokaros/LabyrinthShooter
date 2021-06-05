@@ -41,6 +41,7 @@
     <ClInclude Include="SpriteRenderer.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Vector.h" />
+    <ClInclude Include="GameRoom.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +67,7 @@
     <ClCompile Include="SpriteRenderer.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Vector.cpp" />
+    <ClCompile Include="GameRoom.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -60,7 +60,6 @@ public:
 private:
 	Window& window;
 	Timer timer;
-	InputController input;
 	ObjectManager objectManager;
 
 	GameBitmaps bitmaps;

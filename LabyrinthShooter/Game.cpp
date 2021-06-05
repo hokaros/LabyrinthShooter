@@ -1,15 +1,7 @@
 #include "Game.h"
 
-// Input
-// Nale¿y tu dodaæ wszystkie klawisze, które chce siê odczytywaæ
-SDL_KeyCode steeringKeys[] = { SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_a, SDLK_w, SDLK_d, SDLK_s,
-	SHOOT_KEY,
-	WPN_SWITCH_KEY
-};
-
 Game::Game(Window& window)
 	: window(window),
-	input(steeringKeys, sizeof(steeringKeys) / sizeof(SDL_KeyCode)),
 	basicBullet(Vector(4, 4), objectManager.GetAllObjects()), // uwa¿aæ przy zmienianiu objectManagera
 	superBullet(Vector(10, 10), objectManager.GetAllObjects()) {
 
@@ -73,6 +65,8 @@ void Game::LoadStartingObjects() {
 }
 
 void Game::Run() {
+	InputController* input = InputController::Main();
+
 	SDL_Surface* screen = window.GetScreen();
 	int black = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
 
@@ -100,7 +94,7 @@ void Game::Run() {
 		// Nowa klatka
 		timer.NextFrame();
 
-		if (!input.Update()) {
+		if (!input->Update()) {
 			quit = 1;
 		}
 
