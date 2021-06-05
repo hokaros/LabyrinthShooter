@@ -1,9 +1,11 @@
 #pragma once
 #include "Game.h"
 #include "Draw.h"
+#include "TextBox.h"
 #include <mutex>
 
-#define WAITING_FONTSIZE 14
+#define FONTSIZE_HEADER 25
+#define FONTSIZE_MEDIUM 14
 
 #define NEEDED_PLAYERS 4
 
@@ -22,7 +24,6 @@ public:
 
 private:
 	Window& window;
-	InputController input;
 	Game* game = NULL; // obecna gra
 	Game* nextGame = NULL; // gra przygotowana do uruchomienia
 
@@ -43,3 +44,18 @@ private:
 	void SetNextGame(Game* newGame);
 };
 
+
+// Panel, w którym gracz wybiera serwer
+class RoomFinder
+{
+public:
+	RoomFinder(Window& window);
+
+	void EnterSearch();
+
+private:
+	Window& window;
+
+private:
+	void Draw(TextBox& textBox);
+};

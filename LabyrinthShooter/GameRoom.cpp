@@ -1,18 +1,7 @@
 #include "GameRoom.h"
 
-
-// Input
-// Nale¿y tu dodaæ wszystkie klawisze, które chce siê odczytywaæ podczas gry i menu
-SDL_KeyCode steeringKeys[] = { SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_a, SDLK_w, SDLK_d, SDLK_s,
-	SHOOT_KEY,
-	WPN_SWITCH_KEY,
-	SDLK_ESCAPE,
-	SDLK_RETURN
-};
-
 GameRoom::GameRoom(Window& window)
-	: window(window), playerCount(1),
-	input(steeringKeys, sizeof(steeringKeys) / sizeof(SDL_KeyCode)) {
+	: window(window), playerCount(1) {
 
 }
 
@@ -20,11 +9,13 @@ void GameRoom::Enter() {
 	SDL_Surface* screen = window.GetScreen();
 	int black = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
 
+	InputController* input = InputController::Main();
+
 	bool quit = false;
 	bool shouldStart = false;
 
 	while (!quit) {
-		if (!input.Update()) {
+		if (!input->Update()) {
 			quit = 1;
 		}
 
@@ -47,28 +38,30 @@ void GameRoom::Enter() {
 			startGame = false;
 		}
 
-		if (input.PressedThisFrame(SDLK_RETURN)) {
+		if (input->PressedThisFrame(SDLK_RETURN)) {
 			// Testowe wejœcie do gry
 			SetNextGame(new Game(window, 
 				GameStartInfo(new Vector[1]{ Vector(50, 200) }, 1, 0))
 			);
 			RunGame();
 		}
-		else if (input.PressedThisFrame(SDLK_ESCAPE)) {
+		else if (input->PressedThisFrame(SDLK_ESCAPE)) {
 			quit = true;
 		}
 
 		window.Render();
 	}
+
+	// TODO: roz³¹czenie z serwerem
 }
 
 void GameRoom::DrawWaitingRoom() {
 	char buffer[16];
 	// Informacja o liczbie graczy w poczekalni
 	sprintf_s(buffer, "%d/%d", GetPlayerCount(), NEEDED_PLAYERS);
-	window.DrawString(5, 5, buffer, WAITING_FONTSIZE);
+	window.DrawString(5, 5, buffer, FONTSIZE_MEDIUM);
 
-	window.DrawString(window.GetWidth()/2 - 15*WAITING_FONTSIZE, window.GetHeight()/2 - WAITING_FONTSIZE, "Press enter to start the game", WAITING_FONTSIZE);
+	window.DrawString(window.GetWidth()/2 - 15*FONTSIZE_MEDIUM, window.GetHeight()/2 - FONTSIZE_MEDIUM, "Press enter to start the game", FONTSIZE_MEDIUM);
 }
 
 void GameRoom::StartGame(int selfId, Vector* playerPositions, size_t playerCount) {
@@ -130,4 +123,61 @@ bool GameRoom::ShouldStart() {
 void GameRoom::SetNextGame(Game* newGame) {
 	std::lock_guard<std::mutex> lock(mutex);
 	nextGame = newGame;
+}
+
+
+
+RoomFinder::RoomFinder(Window& window)
+	: window(window) {
+
+}
+
+void RoomFinder::EnterSearch() {
+	SDL_Surface* screen = window.GetScreen();
+	int white = SDL_MapRGB(screen->format, 0xFF, 0xFF, 0xFF);
+	int black = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
+
+	SDL_Rect textArea;
+	textArea.x = 50;
+	textArea.y = window.GetHeight() / 2;
+	textArea.w = window.GetWidth() - 2 * 50;
+	textArea.h = 50;
+	TextBox textBox(textArea, white, black, 20);
+
+
+	InputController* input = InputController::Main();
+
+	bool quit = false;
+
+	while (!quit) {
+		if (!input->Update()) {
+			quit = 1;
+		}
+
+		// Generowanie t³a
+		SDL_FillRect(screen, NULL, black);
+
+		textBox.Update();
+
+		// Wyœwietlenie wyszukiwarki
+		Draw(textBox);
+
+		if (input->PressedThisFrame(SDLK_RETURN)) {
+			// Testowe wejœcie do poczekalni
+			// TODO: próba po³¹czenia z serwerem
+			GameRoom gameRoom(window);
+			gameRoom.Enter();
+		}
+		else if (input->PressedThisFrame(SDLK_ESCAPE)) {
+			quit = true;
+		}
+
+		window.Render();
+	}
+}
+
+void RoomFinder::Draw(TextBox& textBox) {
+	window.DrawString(window.GetWidth() / 2 - FONTSIZE_HEADER * 9, 50, "Podaj ip serwera:", FONTSIZE_HEADER);
+
+	textBox.Draw();
 }

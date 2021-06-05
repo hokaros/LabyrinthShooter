@@ -13,8 +13,31 @@ int main()
 	if (!window.Init())
 		return 1;
 
-	GameRoom gameRoom(window);
-	gameRoom.Enter();
+	// Input
+	// Należy tu dodać wszystkie klawisze, które chce się odczytywać podczas gry i menu
+	// TODO: dodać wszystkie do obsługiwanych
+	SDL_KeyCode steeringKeys[] = { SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_a, SDLK_w, SDLK_d, SDLK_s,
+		SHOOT_KEY,
+		WPN_SWITCH_KEY,
+		SDLK_ESCAPE,
+		SDLK_RETURN,
+		SDLK_0,
+		SDLK_1,
+		SDLK_2,
+		SDLK_3,
+		SDLK_4,
+		SDLK_5,
+		SDLK_6,
+		SDLK_7,
+		SDLK_8,
+		SDLK_9,
+		SDLK_BACKSPACE,
+		(SDL_KeyCode)'.'
+	};
+	InputController input(steeringKeys, sizeof(steeringKeys) / sizeof(SDL_KeyCode));
+
+	RoomFinder roomFinder(window);
+	roomFinder.EnterSearch();
 
 	return 0;
 }
