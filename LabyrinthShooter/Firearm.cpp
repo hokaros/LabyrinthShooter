@@ -1,7 +1,7 @@
 #include "Firearm.h"
 
-Firearm::Firearm(GameObject& owner, const GameObject& bulletPrefab, float reloadTime)
-	: ObjectComponent(owner), bulletPrefab(bulletPrefab), reloadTime(reloadTime) {
+Firearm::Firearm(GameObject& owner, const GameObject& bulletPrefab, float reloadTime, FirearmType type)
+	: ObjectComponent(owner), bulletPrefab(bulletPrefab), reloadTime(reloadTime), type(type) {
 
 	gameObject.collisionEnabled = false;
 }
@@ -11,15 +11,12 @@ void Firearm::Update() {
 	if (timeSinceLastShot >= reloadTime) {
 		isReloaded = true;
 	}
-
-	if (InputController::Main()->IsKeyDown(SHOOT_KEY) && isReloaded) {
-		Shoot();
-		timeSinceLastShot = 0.0f;
-		isReloaded = false;
-	}
 }
 
-void Firearm::Shoot() {
+void Firearm::TryShoot() {
+	if (!isReloaded)
+		return;
+
 	// Stworzenie pocisku
 	GameObject* bullet = new GameObject(bulletPrefab);
 
@@ -33,8 +30,16 @@ void Firearm::Shoot() {
 
 	// Nadanie kierunku lotu
 	bullet->FindComponent<Bullet>()->SetDirection(gameObject.LookingDirection());
+
+	// Aktualizacja info o prze³adowaniu
+	timeSinceLastShot = 0.0f;
+	isReloaded = false;
 }
 
 ObjectComponent* Firearm::Copy(GameObject& newOwner) {
-	return new Firearm(newOwner, bulletPrefab, reloadTime);
+	return new Firearm(newOwner, bulletPrefab, reloadTime, type);
+}
+
+FirearmType Firearm::GetType() const {
+	return type;
 }

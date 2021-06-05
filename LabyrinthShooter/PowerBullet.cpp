@@ -1,12 +1,12 @@
 #include "PowerBullet.h"
 
-PowerBullet::PowerBullet(GameObject& owner, float speed)
-	: Bullet(owner, speed), health(POWER_BULLET_HEALTH) {
+PowerBullet::PowerBullet(GameObject& owner, float speed, int damage)
+	: Bullet(owner, speed, damage), health(POWER_BULLET_HEALTH) {
 	gameObject.isStatic = true;
 }
 
 ObjectComponent* PowerBullet::Copy(GameObject& newOwner) {
-	return new PowerBullet(newOwner, speed);
+	return new PowerBullet(newOwner, speed, damage);
 }
 
 void PowerBullet::OnCollision(GameObject& collider) {

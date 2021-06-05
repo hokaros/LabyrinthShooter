@@ -1,4 +1,5 @@
 #include "Vector.h"
+#include <SDL_stdinc.h>
 
 Vector::Vector()
 	: x(0), y(0) {
@@ -54,6 +55,20 @@ void Vector::Sort() {
 	y = x;
 }
 
+void Vector::Rotate(float angle) {
+	float length = Length();
+
+	float currAngle = GetAngle();
+	float targetAngle = currAngle + angle;
+
+	x = cos(targetAngle) * length;
+	y = sin(targetAngle) * length;
+}
+
+double Vector::GetAngle() const {
+	return atan2(y, x);
+}
+
 float Vector::Length() const {
 	return sqrtf(x * x + y * y);
 }
@@ -95,6 +110,10 @@ Vector operator/(const Vector& left, float dividor) {
 	result.x = left.x / dividor;
 	result.y = left.y / dividor;
 	return result;
+}
+
+double Vector::GetAngle(const Vector& v1, const Vector& v2) {
+	return v1.GetAngle() - v2.GetAngle();
 }
 
 

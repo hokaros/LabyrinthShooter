@@ -29,6 +29,13 @@ public:
 	// Znajduje komponent okreœlonego typu
 	template<class T>
 	T* FindComponent();
+	// Znajduje wszystkie komponenty okreœlonego typu
+	template<class T>
+	std::list<T*>* FindComponents();
+	// Znajduje wszystkie komponenty okreœlonego typu u dzieci
+	template<class T>
+	std::list<T*>* FindComponentsInChildren();
+	
 
 	// Raz na klatkê
 	void Update();
@@ -43,6 +50,7 @@ public:
 	bool Collides(const GameObject& other) const;
 	bool CollidesWithAny() const;
 
+	// Odwracalne zniszczenie obiektu
 	void SetDestroyed(bool destroyed);
 	void SetEnabled(bool enabled);
 	bool IsDestroyed() const;
@@ -58,6 +66,9 @@ public:
 	Vector LocalToWorld(const Vector& localPos) const;
 
 	void AddChild(GameObject* child);
+	void RemoveChild(GameObject* child);
+	const std::list<GameObject*>& GetChildren() const;
+	GameObject* GetParent() const;
 
 
 	~GameObject();
@@ -102,4 +113,35 @@ T* GameObject::FindComponent() {
 		}
 	}
 	return NULL;
+}
+
+template<class T>
+std::list<T*>* GameObject::FindComponents() {
+	std::list<T*>* found = new std::list<T*>();
+
+	for (IUpdateable* component : components) {
+		T* desired = dynamic_cast<T*>(component);
+		if (desired != NULL) {
+			found->push_back(desired);
+		}
+	}
+
+	return found;
+}
+
+template<class T>
+std::list<T*>* GameObject::FindComponentsInChildren() {
+	std::list<T*>* found = new std::list<T*>();
+
+	for (GameObject* child : children) {
+		std::list<T*>* foundInChild = child->FindComponents<T>();
+
+		for (T* desired : *foundInChild) {
+			found->push_back(desired);
+		}
+
+		delete foundInChild;
+	}
+
+	return found;
 }

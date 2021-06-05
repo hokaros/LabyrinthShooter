@@ -21,9 +21,12 @@
   <ItemGroup>
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Cage.h" />
+    <ClInclude Include="ConstantMover.h" />
     <ClInclude Include="Draw.h" />
     <ClInclude Include="Firearm.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Health.h" />
     <ClInclude Include="InputController.h" />
     <ClInclude Include="IUpdateable.h" />
     <ClInclude Include="Labirynt.h" />
@@ -37,16 +40,22 @@
     <ClInclude Include="RectangleRenderer.h" />
     <ClInclude Include="Regenerable.h" />
     <ClInclude Include="SpriteRenderer.h" />
+    <ClInclude Include="StatRenderer.h" />
+    <ClInclude Include="TextBox.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Vector.h" />
+    <ClInclude Include="GameRoom.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Cage.cpp" />
+    <ClCompile Include="ConstantMover.cpp" />
     <ClCompile Include="Draw.cpp" />
     <ClCompile Include="Firearm.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Health.cpp" />
     <ClCompile Include="InputController.cpp" />
     <ClCompile Include="Labirynt.cpp" />
     <ClCompile Include="LabyrinthShooter.cpp" />
@@ -60,8 +69,11 @@
     <ClCompile Include="RectangleRenderer.cpp" />
     <ClCompile Include="Regenerable.cpp" />
     <ClCompile Include="SpriteRenderer.cpp" />
+    <ClCompile Include="StatRenderer.cpp" />
+    <ClCompile Include="TextBox.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Vector.cpp" />
+    <ClCompile Include="GameRoom.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

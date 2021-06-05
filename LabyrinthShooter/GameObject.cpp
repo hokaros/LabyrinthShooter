@@ -18,6 +18,7 @@ GameObject::GameObject(const Vector& size, const Vector& position, const std::li
 
 GameObject::GameObject(const GameObject& other) 
 	: GameObject(other.size, other.position, other.allObjects) {
+	// Skopiowanie komponentów
 	for (IUpdateable* component : other.components) {
 		IUpdateable* cmpCpy;
 
@@ -31,6 +32,13 @@ GameObject::GameObject(const GameObject& other)
 		}
 
 		components.push_back(cmpCpy);
+	}
+
+	// Skopiowanie dzieci
+	for (GameObject* child : other.children) {
+		GameObject* childCopy = new GameObject(*child);
+
+		AddChild(childCopy);
 	}
 }
 
@@ -153,22 +161,41 @@ void GameObject::LookAt(const Vector& point) {
 
 Vector GameObject::LocalToWorld(const Vector& localPos) const {
 	Vector fromMid = localPos - size / 2;
-	double radius = fromMid.Length();
+	//double radius = fromMid.Length();
+	fromMid.Rotate(rotation * M_PI / 180);
 
-	double localAngle = atan2(fromMid.y, fromMid.x) * 180 / M_PI;
+	Vector rotatedSize = size;
+	rotatedSize.Rotate(rotation * M_PI / 180);
+
+	return fromMid + position + rotatedSize / 2;
+	/*double localAngle = atan2(fromMid.y, fromMid.x) * 180 / M_PI;
 	double targetAngle = localAngle - rotation;
 
 	Vector unrotatedPos(
 		cos(targetAngle * M_PI / 180) * radius,
 		sin(targetAngle * M_PI / 180) * radius
-	);
-	return unrotatedPos + position + size/2;
+	);*/
+	//return unrotatedPos + position + rotatedSize / 2;
 }
 
 void GameObject::AddChild(GameObject* child) {
 	child->parent = this;
 
 	children.push_back(child);
+}
+
+void GameObject::RemoveChild(GameObject* child) {
+	child->parent = NULL;
+
+	children.remove(child);
+}
+
+const std::list<GameObject*>& GameObject::GetChildren() const {
+	return children;
+}
+
+GameObject* GameObject::GetParent() const {
+	return parent;
 }
 
 bool GameObject::Collides(const GameObject& other) const {
@@ -212,6 +239,10 @@ void GameObject::SetDestroyed(bool destroyed) {
 
 void GameObject::SetEnabled(bool enabled) {
 	isEnabled = enabled;
+
+	for (GameObject* child : children) {
+		child->SetEnabled(enabled);
+	}
 }
 
 bool GameObject::IsDestroyed() const {

@@ -24,8 +24,14 @@ public:
 
 	void RenderTexture(SDL_Texture* texture, const SDL_Rect& rect, double angle);
 
+	// narysowanie napisu txt na ekranie, zaczynaj¹c od punktu (x, y)
+	void DrawString(int x, int y, const char* text, int fontSize);
+
 	SDL_Surface* GetScreen() const;
 	SDL_Renderer* GetRenderer() const;
+
+	int GetWidth() const;
+	int GetHeight() const;
 
 	static Window* Main();
 private:
@@ -34,6 +40,7 @@ private:
 
 	SDL_Surface* screen = NULL;
 	SDL_Surface* charset = NULL;
+	SDL_Surface* bigCharset = NULL;
 	SDL_Texture* scrtex = NULL;
 	SDL_Window* window = NULL;
 	SDL_Renderer* renderer = NULL;
@@ -41,5 +48,8 @@ private:
 	std::list<TextureRenderArgs> renderTextures;
 
 	static Window* mainWindow;
+
+private:
+	bool LoadCharsets();
 };
 

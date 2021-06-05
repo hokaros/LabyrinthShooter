@@ -7,7 +7,7 @@ class PowerBullet :
 	public Bullet
 {
 public:
-	PowerBullet(GameObject& owner, float speed);
+	PowerBullet(GameObject& owner, float speed, int damage);
 
 	virtual ObjectComponent* Copy(GameObject& newOwner) override;
 protected:

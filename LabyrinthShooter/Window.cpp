@@ -56,19 +56,8 @@ bool Window::Init() {
 		SDL_TEXTUREACCESS_STREAMING,
 		width, height);
 
-	// wczytanie obrazka cs8x8.bmp
-	charset = SDL_LoadBMP("resources/cs8x8.bmp");
-	if (charset == NULL) {
-		printf("SDL_LoadBMP(resources/cs8x8.bmp) error: %s\n", SDL_GetError());
-		SDL_FreeSurface(screen);
-		SDL_DestroyTexture(scrtex);
-		SDL_DestroyWindow(window);
-		SDL_DestroyRenderer(renderer);
-		SDL_Quit();
+	if (!LoadCharsets())
 		return false;
-	};
-
-	SDL_SetColorKey(charset, true, 0x000000);
 
 	return true;
 }
@@ -98,10 +87,59 @@ void Window::RenderTexture(SDL_Texture* texture, const SDL_Rect& rect, double an
 	);
 }
 
+void Window::DrawString(int x, int y, const char* text, int fontSize) {
+	int px, py, c;
+	SDL_Rect s, d;
+	s.w = 8;
+	s.h = 8;
+	d.w = fontSize;
+	d.h = fontSize;
+
+	while (*text) {
+		c = *text & 255;
+		px = (c % 16) * 8;
+		py = (c / 16) * 8;
+		s.x = px;
+		s.y = py;
+		d.x = x;
+		d.y = y;
+		SDL_BlitScaled(charset, &s, screen, &d);
+		//SDL_BlitSurface(charset, &s, screen, &d);
+		x += fontSize;
+		text++;
+	};
+}
+
 SDL_Surface* Window::GetScreen() const {
 	return screen;
 }
 
 SDL_Renderer* Window::GetRenderer() const {
 	return renderer;
+}
+
+int Window::GetWidth() const {
+	return width;
+}
+
+int Window::GetHeight() const {
+	return height;
+}
+
+bool Window::LoadCharsets() {
+	// wczytanie obrazka cs8x8.bmp
+	charset = SDL_LoadBMP("resources/cs8x8.bmp");
+	if (charset == NULL) {
+		printf("SDL_LoadBMP(resources/cs8x8.bmp) error: %s\n", SDL_GetError());
+		SDL_FreeSurface(screen);
+		SDL_DestroyTexture(scrtex);
+		SDL_DestroyWindow(window);
+		SDL_DestroyRenderer(renderer);
+		SDL_Quit();
+		return false;
+	};
+
+	SDL_SetColorKey(charset, true, 0x000000);
+
+	return true;
 }

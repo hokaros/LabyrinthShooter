@@ -1,7 +1,9 @@
 #include "Bullet.h"
 
-Bullet::Bullet(GameObject& owner, float speed)
-	: ObjectComponent(owner), speed(speed), direction(Direction::EAST) {
+Bullet::Bullet(GameObject& owner, float speed, int damage)
+	: ObjectComponent(owner), speed(speed), direction(Direction::EAST), damage(damage) {
+
+	gameObject.isStatic = true;
 
 	owner.onCollision =
 		[this](GameObject& collider) {
@@ -16,13 +18,17 @@ void Bullet::Update() {
 }
 
 void Bullet::OnCollision(GameObject& collider) {
-	// TODO: obs³uga trafienia gracza
+	// Obs³uga trafienia gracza
+	Health* playerHealth = collider.FindComponent<Health>();
+	if (playerHealth != NULL) {
+		playerHealth->Hurt(damage);
+	}
 
 	ObjectManager::Main()->DestroyObject(&gameObject);
 }
 
 ObjectComponent* Bullet::Copy(GameObject& newOwner) {
-	return new Bullet(newOwner, speed);
+	return new Bullet(newOwner, speed, damage);
 }
 
 void Bullet::SetDirection(const Vector& direction) {

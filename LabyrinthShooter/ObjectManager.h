@@ -7,14 +7,18 @@ class ObjectManager
 public:
 	ObjectManager();
 
+	// Dodaje obiekt do zarz¹dzanych wraz z ca³ym drzewem dzieci
 	void AddObject(GameObject* object);
 	// Usuwanie obiektu jest zadaniem kogoœ innego
 	void AddUndestroyable(GameObject* object);
-	void DestroyObject(GameObject* object);
+	void DestroyObject(GameObject* object, bool detach=true);
 
 	void DisposeDestroyed();
 
 	const std::list<GameObject*>& GetAllObjects() const;
+
+	// Usuwa natychmiast wszystkie obiekty
+	void Clear();
 
 	~ObjectManager();
 
