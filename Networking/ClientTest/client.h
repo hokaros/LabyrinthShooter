@@ -1,6 +1,10 @@
 #pragma once
 #include "../connection/ConnectionHandler.h"
 #include "../connection/Message.h"
+
+#define PLAYERS_NUM 2
+
+
 class Client
 {
 public:

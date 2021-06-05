@@ -70,9 +70,9 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 	case WildMessage::WRITE:
 		for (int i = 0; i < 3; i++)
 		{
-			int from_msg;
+			bool from_msg;
 			msg >> from_msg;
-			std::cout << "\n" << from_msg << "\n";
+			std::cout << from_msg << "\n";
 		}
 		break;
 	case WildMessage::PLAYER_DEATH:
@@ -103,6 +103,7 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 			if (players[i] == NULL)
 			{
 				players[i] = connection;
+				clientIdIndexMap[clientId] = i;
 				joined = true;
 				break;
 			}
@@ -114,6 +115,8 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 		else msg.header.id = WildMessage::JOIN_DENIED;
 
 		connection->WriteMessage(msg);
+
+		if (playersReady()) initGame();
 
 		break;
 	}
@@ -130,3 +133,100 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 	default: break;
 	}
 }
+
+bool Server::playersReady()
+{
+	bool ready = true;
+	for (int i = 0; i < PLAYERS_NUM; i++)
+	{
+		if (players[i] == NULL)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+void Server::initGame()
+{
+	GenerateAndSendPositions();
+	for (int i = 0; i < PLAYERS_NUM; i++)
+	{
+		Message<WildMessage> message = CreateMessageGameInit(i);
+		players[i]->WriteMessage(message);
+	}
+}
+
+void Server::GenerateAndSendPositions() {
+
+	srand((unsigned int)time(NULL));
+	const float offsetX = 50;
+	const float offsetY = 50;
+
+	float tmpX;
+	float tmpY;
+
+
+	for (int i = 0; i < PLAYERS_NUM; i++) {
+
+		while (true) {
+
+			bool inValidPosition = false;
+			tmpX = (float(std::rand()) / float((RAND_MAX)) * WIDTH);
+			tmpY = (float(std::rand()) / float((RAND_MAX)) * HEIGHT);
+
+			for (int j = 0; j < posX.size(); j++) {
+				if (abs(posX[j] - tmpX) < offsetX && abs(posY[j] - tmpY) < offsetY) inValidPosition = true;
+			}
+
+			if (!inValidPosition) {
+				posY.push_back(tmpY);
+				posX.push_back(tmpX);
+				break;
+			}
+		}
+	}
+
+	/*Message<WildMessage> msg;
+	msg.header.id = WildMessage::POSITION;
+	for (int i = PLAYERS_NUM - 1; i >= 0; i--) {
+		msg << posY[i];
+		msg << posX[i];
+	}
+	MessageAllClients(msg);*/
+}
+
+void Server::MessageAllClients(const Message<WildMessage>& message) {
+
+	for (int i = 0; i < PLAYERS_NUM; i++) {
+
+		players[i]->WriteMessage(message);
+	}
+}
+
+//	Creating message functions
+Message<WildMessage> Server::CreateMessageGameInit(int id) {
+
+	Message<WildMessage> message;
+	message.header.id = WildMessage::GAME_STARTED;
+	//	TODO
+
+	//example
+	int num = 4;
+	bool walls[] = { 1,1,0,0 };
+	//float start_A_x = 10.5, start_A_y = 20;
+	//float start_B_x = 19.5, start_B_y = 20;
+
+	for (int i = num - 1; i >= 0; i--) message << walls[i];
+
+	//message << start_B_y << start_B_x;
+	//message << start_A_y << start_A_x;
+	for (int i = PLAYERS_NUM - 1; i >= 0; i--) {
+		message << posY[i];
+		message << posX[i];
+	}
+
+	message << id;
+	//
+	return message;
+};

@@ -117,17 +117,44 @@ void Client::OnMessageReceived(const Message<WildMessage>& message) {
 	case WildMessage::JOIN_REQUEST:
 		break;
 	case WildMessage::JOIN_ACCEPT:
-		std::cout << "Joined";
+		std::cout << "Joined\n";
 		break;
 	case WildMessage::JOIN_DENIED:
-		std::cout << "Waiting";
+		std::cout << "Waiting\n";
 		break;
 	case WildMessage::PLAYER_JOINED:
 		break;
 	case WildMessage::PLAYER_LEFT:
 		break;
 	case WildMessage::GAME_STARTED:
+	{
+		std::cout << "Game Started\n";
+		int id;
+		float positions[PLAYERS_NUM][2];
+
+		//	TODO
+		int num = 4;
+
+		msg >> id;
+		std::cout << "Id: " << id << "\n";
+		for (int i = 0; i < PLAYERS_NUM; i++)
+		{
+			msg >> positions[i][0];
+			msg >> positions[i][1];
+			std::cout << "Position " << i << ": " << positions[i][0] << ' ' << positions[i][1] << "\n";
+		}
+
+		std::cout << "Walls : " ;
+		for (int i = 0; i < num; i++)
+		{
+			bool wall;
+			msg >> wall;
+			std::cout << wall << ' ';
+		}
+		std::cout << "\n";
+		//
 		break;
+	}
 	default: break;
 	}
 }
