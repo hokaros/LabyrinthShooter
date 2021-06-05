@@ -85,6 +85,7 @@ GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
 	// Obiekt gracza
 	GameObject* player = new GameObject(Vector(20, 20), position, objectManager.GetAllObjects());
 	player->AddComponent(new SpriteRenderer(*player, screen, bitmaps.playerBmp));
+	player->AddComponent(new ConstantMover(*player, PLAYER_SPEED));
 	objectManager.AddObject(player);
 
 	// Broñ
@@ -126,7 +127,7 @@ GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
 	);
 
 	if (isControlled) {
-		player->AddComponent(new PlayerController(*player, 300.0f));
+		player->AddComponent(new PlayerController(*player));
 	}
 
 	return player;

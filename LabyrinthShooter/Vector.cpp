@@ -65,7 +65,7 @@ void Vector::Rotate(float angle) {
 	y = sin(targetAngle) * length;
 }
 
-float Vector::GetAngle() const {
+double Vector::GetAngle() const {
 	return atan2(y, x);
 }
 
@@ -110,6 +110,10 @@ Vector operator/(const Vector& left, float dividor) {
 	result.x = left.x / dividor;
 	result.y = left.y / dividor;
 	return result;
+}
+
+double Vector::GetAngle(const Vector& v1, const Vector& v2) {
+	return v1.GetAngle() - v2.GetAngle();
 }
 
 

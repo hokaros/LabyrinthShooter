@@ -38,13 +38,16 @@ public:
     // Obraca o k¹t w radianach
     void Rotate(float angle);
     // Zwraca k¹t w radianach wskazywany przez wektor
-    float GetAngle() const;
+    double GetAngle() const;
 
     friend Vector operator+(const Vector& left, const Vector& right);
     friend Vector& operator+=(Vector& left, const Vector& right);
     friend Vector operator-(const Vector& left, const Vector& right);
     friend Vector operator*(const Vector& left, float multiplier);
     friend Vector operator/(const Vector& left, float dividor);
+
+    // K¹t w radianach miêdzy dwoma wektorami
+    static double GetAngle(const Vector& v1, const Vector& v2);
 };
 
 struct Rect 

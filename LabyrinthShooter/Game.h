@@ -28,6 +28,7 @@
 #define WPN_SUPER_RELOAD 2
 
 #define MAX_HEALTH 3
+#define PLAYER_SPEED 300.0
 
 
 struct GameBitmaps {
