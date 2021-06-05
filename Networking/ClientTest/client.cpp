@@ -73,14 +73,62 @@ bool Client::Send(Message<WildMessage>& msg)
 	return true;
 }
 
+void Client::GameProtocol()
+{
+	Message<WildMessage> msg;
+	msg.header.id = WildMessage::JOIN_REQUEST;
 
-void Client::OnMessageReceived(const Message<WildMessage>& msg) {
-	if (msg.header.id == WildMessage::LOCK_MOUSE) {
-		int duration = 0;
-		std::memcpy(&duration, msg.body.data(), (sizeof(int) <= msg.body.size()) ? sizeof(int) : msg.body.size());
+	Send(msg);
+}
 
-		if (onMouseLocked)
-			onMouseLocked(duration);
+
+void Client::OnMessageReceived(const Message<WildMessage>& message) {
+	WildMessage msgType = message.header.id;
+	Message<WildMessage> msg = message;
+
+	switch (msgType)
+	{
+	case WildMessage::WRITE:
+		for (int i = 0; i < 3; i++)
+		{
+			int from_msg;
+			msg >> from_msg;
+			std::cout << "\n" << from_msg << "\n";
+		}
+		break;
+	case WildMessage::PLAYER_DEATH:
+		break;
+	case WildMessage::WALL_DESTRUCTION:
+		break;
+	case WildMessage::LABIRYNTH_CHANGE:
+		break;
+	case WildMessage::END_OF_GAME:
+		break;
+	case WildMessage::POSITION:
+		break;
+	case WildMessage::NEW_DIRECTION:
+		break;
+	case WildMessage::WEAPON_CHANGE:
+		break;
+	case WildMessage::CHANGE_OF_AIMING_DIRECTION:
+		break;
+	case WildMessage::SHOT:
+		break;
+	case WildMessage::JOIN_REQUEST:
+		break;
+	case WildMessage::JOIN_ACCEPT:
+		std::cout << "Joined";
+		break;
+	case WildMessage::JOIN_DENIED:
+		std::cout << "Waiting";
+		break;
+	case WildMessage::PLAYER_JOINED:
+		break;
+	case WildMessage::PLAYER_LEFT:
+		break;
+	case WildMessage::GAME_STARTED:
+		break;
+	default: break;
 	}
 }
 //Zmiany
@@ -108,7 +156,7 @@ Message<WildMessage> Client::CreateMessageLabirynthChange(bool* change, int size
 	}
 	return message;
 };
-Message<WildMessage> Client::CreateMessagePosition(Vector pos, int id) {
+/*Message<WildMessage> Client::CreateMessagePosition(Vector pos, int id) {
 
 	Message<WildMessage> message;
 	message.header.id = WildMessage::POSITION;
@@ -131,7 +179,7 @@ Message<WildMessage> Client::CreateMessageWeaponChange(WeaponType type, int id) 
 	message << id;
 	message << type;
 	return message;
-};
+};*/
 Message<WildMessage> Client::CreateMessageChangeOfAimingDirection(float aimDir, int id) {
 
 	Message<WildMessage> message;

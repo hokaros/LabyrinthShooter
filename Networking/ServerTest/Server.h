@@ -1,11 +1,13 @@
 #pragma once
 #include <thread>
 #include <deque>
+#include <map>
 
 #include "../connection/ConnectionHandler.h"
 #include "../connection/Message.h"
 
 #define PORT_DEFAULT 80
+#define PLAYERS_NUM 2
 
 
 class Server
@@ -18,7 +20,7 @@ public:
 
 	Server();
 	void Listen();
-	void RequestMouseLock(int clientId, int duration);
+
 	void Stop();
 	~Server();
 protected:
@@ -32,7 +34,10 @@ private:
 	asio::ip::tcp::acceptor acceptor;
 
 	std::deque<ConnectionHandler<WildMessage>*> connections;
+	std::map<int, ConnectionHandler<WildMessage>*> clientIdMap;
 	std::thread* contextThread;
+
+	ConnectionHandler<WildMessage>* players[PLAYERS_NUM];
 private:
 	void WaitForClientConnection();
 };

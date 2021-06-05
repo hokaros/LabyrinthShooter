@@ -4,7 +4,8 @@ Server::Server()
 	: idleWork(context),
 	endpoint(asio::ip::tcp::v4(), PORT_DEFAULT), acceptor(context, endpoint),
 	contextThread(NULL) {
-
+	//	Inicjacja tablicy graczy
+	for (int i = 0; i < PLAYERS_NUM; i++) players[i] = NULL;
 }
 
 Server::~Server() {
@@ -40,7 +41,10 @@ void Server::WaitForClientConnection() {
 			connections.push_back(newConnection);
 			if (onClientConnected)
 				onClientConnected(lastClientId);
+			//	Dodanie do slownika powiazania id z ConnectionHandler
+			clientIdMap[lastClientId] = newConnection;
 
+			
 			newConnection->OpenInput();
 		}
 
@@ -71,36 +75,58 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 			std::cout << "\n" << from_msg << "\n";
 		}
 		break;
-	default: break;
+	case WildMessage::PLAYER_DEATH:
+		break;
+	case WildMessage::WALL_DESTRUCTION:
+		break;
+	case WildMessage::LABIRYNTH_CHANGE:
+		break;
+	case WildMessage::END_OF_GAME:
+		break;
+	case WildMessage::POSITION:
+		break;
+	case WildMessage::NEW_DIRECTION:
+		break;
+	case WildMessage::WEAPON_CHANGE:
+		break;
+	case WildMessage::CHANGE_OF_AIMING_DIRECTION:
+		break;
+	case WildMessage::SHOT:
+		break;
+	case WildMessage::JOIN_REQUEST:
+	{
+		//	Dodanie gracza do tablicy
+		ConnectionHandler<WildMessage>* connection = clientIdMap[clientId];
+		bool joined = false;
+		for (int i = 0; i < PLAYERS_NUM; i++)
+		{
+			if (players[i] == NULL)
+			{
+				players[i] = connection;
+				joined = true;
+				break;
+			}
+		}
+
+		Message<WildMessage> msg;
+
+		if (joined) msg.header.id = WildMessage::JOIN_ACCEPT;
+		else msg.header.id = WildMessage::JOIN_DENIED;
+
+		connection->WriteMessage(msg);
+
+		break;
 	}
-
-	/*size_t size = message.body.size();
-	char* str = new char[size + 1];
-	std::memcpy(str, message.body.data(), size);
-	str[size] = '\0';
-
-	std::string stri;
-	stri.append(str);
-
-	onMessageReceived(clientId, stri);*/
-}
-
-void Server::RequestMouseLock(int clientId, int duration) {
-	Message<WildMessage> msg;
-	msg.header.id = WildMessage::LOCK_MOUSE;
-	msg << duration;
-
-	for (auto connection : connections) {
-		if (connection == NULL) {
-			continue;
-		}
-
-		if (!connection->IsConnected()) {
-			onClientDisconnected(connection->GetId());
-			continue;
-		}
-		if (connection->GetId() == clientId) {
-			connection->WriteMessage(msg);
-		}
+	case WildMessage::JOIN_ACCEPT:
+		break;
+	case WildMessage::JOIN_DENIED:
+		break;
+	case WildMessage::PLAYER_JOINED:
+		break;
+	case WildMessage::PLAYER_LEFT:
+		break;
+	case WildMessage::GAME_STARTED:
+		break;
+	default: break;
 	}
 }

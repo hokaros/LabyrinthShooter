@@ -12,7 +12,6 @@ std::map<int, std::vector<char>*> clientKeys;
 void onClientConnected(int id) {
 	// Dodanie klienta do listy
 	clientKeys.insert(std::pair<int, std::vector<char>*>(id, new std::vector<char>()));
-	std::cout << "XD\n";
 	/*char* text = toCStr(id);
 
 	SendMessageA(hClientList, LB_ADDSTRING, 0, (LPARAM)text);
@@ -54,10 +53,20 @@ void initServer() {
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    std::cout << "Server started\n";
 	initServer();
 
-	system("pause");
+	std::string command = "";
+
+	while (command != "quit")
+	{
+		std::cout << "# ";
+		std::cin >> command;
+
+		if (command == "quit") break;
+		else if (command == "") continue;
+		else std::cout << "Nieprawidlowa komenda\n";
+	}
 
 	return 0;
 }

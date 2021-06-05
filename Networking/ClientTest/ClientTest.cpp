@@ -10,28 +10,19 @@ int main()
 	client = new Client("127.0.0.1", 80);
 	client->Connect();
 
-	std::string str;
-	int i, j, k;
-	std::cin >> i;
-	std::cin >> j;
-	std::cin >> k;
+	client->GameProtocol();
 
-	Message<WildMessage> msg;
-	msg.header.id = WildMessage::WRITE;
-	msg << i;
-	msg << j;
-	msg << k;
+	std::string command = "";
 
-	client->Send(msg);
+	while (command != "quit")
+	{
+		std::cout << "# ";
+		std::cin >> command;
 
-	//std::string from_msg;
-	int from_msg;
-	msg >> from_msg;
-	std::cout << "\n" << from_msg << "\n";
-	msg >> from_msg;
-	std::cout << "\n" << from_msg << "\n";
-	msg >> from_msg;
-	std::cout << "\n" << from_msg << "\n";
+		if (command == "quit") break;
+		else if (command == "") continue;
+		else std::cout << "Nieprawidlowa komenda\n";
+	}
 
 	return 0;
 }
