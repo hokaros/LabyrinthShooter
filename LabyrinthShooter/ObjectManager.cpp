@@ -70,3 +70,13 @@ void ObjectManager::DisposeDestroyed() {
 const std::list<GameObject*>& ObjectManager::GetAllObjects() const {
 	return allObjects;
 }
+
+void ObjectManager::Clear() {
+	for (GameObject* go : destroyables) {
+		delete go;
+	}
+
+	allObjects.clear();
+	destroyables.clear();
+	destroyed.clear();
+}

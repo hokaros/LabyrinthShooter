@@ -17,6 +17,9 @@ public:
 
 	const std::list<GameObject*>& GetAllObjects() const;
 
+	// Usuwa natychmiast wszystkie obiekty
+	void Clear();
+
 	~ObjectManager();
 
 	static ObjectManager* Main();
