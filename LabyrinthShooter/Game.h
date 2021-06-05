@@ -46,10 +46,26 @@ private:
 	bool bitmapsOk = true;
 };
 
+
+struct GameStartInfo {
+public:
+	GameStartInfo(Vector* playerPositions, size_t playerCount);
+	GameStartInfo(GameStartInfo&& other);
+	~GameStartInfo();
+
+	Vector GetPlayerPosition(int index) const;
+	size_t GetPlayerCount() const;
+
+private:
+	Vector* playerPositions;
+	size_t playerCount;
+};
+
+
 class Game
 {
 public:
-	Game(Window& window);
+	Game(Window& window, GameStartInfo&& gameInfo);
 
 	// G³ówna pêtla gry
 	void Run();
@@ -62,6 +78,8 @@ private:
 	Timer timer;
 	ObjectManager objectManager;
 
+	GameStartInfo startInfo;
+
 	GameBitmaps bitmaps;
 
 	GameObject basicBullet; // TODO: przenieœæ prefaby do osobnej struktury
@@ -69,4 +87,6 @@ private:
 
 private:
 	void LoadStartingObjects();
+
+	GameObject* CreatePlayer(const Vector& position, bool isControlled = false);
 };

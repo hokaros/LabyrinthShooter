@@ -1,9 +1,10 @@
 #include "Game.h"
 
-Game::Game(Window& window)
+Game::Game(Window& window, GameStartInfo&& gameInfo)
 	: window(window),
 	basicBullet(Vector(4, 4), objectManager.GetAllObjects()), // uwa¿aæ przy zmienianiu objectManagera
-	superBullet(Vector(10, 10), objectManager.GetAllObjects()) {
+	superBullet(Vector(10, 10), objectManager.GetAllObjects()),
+	startInfo(std::move(gameInfo)) {
 
 	SDL_Surface* screen = window.GetScreen();
 
@@ -18,50 +19,11 @@ Game::Game(Window& window)
 }
 
 void Game::LoadStartingObjects() {
-	SDL_Surface* screen = window.GetScreen();
-
 	// TODO: pobieranie pozycji wejœciowej gracza
-	GameObject* player = new GameObject(Vector(20, 20), Vector(30, 250), objectManager.GetAllObjects());
-	player->AddComponent(new SpriteRenderer(*player, screen, bitmaps.playerBmp));
-	player->AddComponent(new PlayerController(*player, 300.0f));
-	objectManager.AddObject(player);
 
-	// Broñ
-	GameObject* basicWeapon = new GameObject(
-		Vector(30, 10),
-		player->GetPosition() + Vector(Direction::EAST) * player->GetSize().x,
-		objectManager.GetAllObjects()
-	);
-	basicWeapon->AddComponent(new Firearm(*basicWeapon, basicBullet, WPN_BASIC_RELOAD, FirearmType::Basic));
-	basicWeapon->AddComponent(new SpriteRenderer(*basicWeapon, screen, bitmaps.wpnBasicBmp));
-	player->AddChild(basicWeapon);
-	objectManager.AddObject(basicWeapon);
-	// Silna broñ
-	GameObject* superWeapon = new GameObject(
-		Vector(30, 10),
-		player->GetPosition() + Vector(Direction::EAST) * player->GetSize().x,
-		objectManager.GetAllObjects()
-	);
-	superWeapon->AddComponent(new Firearm(*superWeapon, superBullet, WPN_SUPER_RELOAD, FirearmType::Super));
-	superWeapon->AddComponent(new SpriteRenderer(*superWeapon, screen, bitmaps.wpnSuperBmp));
-	player->AddChild(superWeapon);
-	objectManager.AddObject(superWeapon);
-
-	// Ekwipunek
-	player->AddComponent(new PlayerEquipment(*player));
-	// Zdrowie
-	Health* playerHealth = new Health(*player, MAX_HEALTH);
-	player->AddComponent(playerHealth);
-	playerHealth->SubscribeDeath(
-		[&](Health* deadPlayer) {
-			printf("Dead\n");
-			objectManager.DestroyObject(&(deadPlayer->GetOwner()));
-		}
-	);
-
-	GameObject* player2 = new GameObject(*player);
-	player2->SetPosition(Vector(130, 250));
-	objectManager.AddObject(player2);
+	for (size_t i = 0; i < startInfo.GetPlayerCount(); i++) {
+		CreatePlayer(startInfo.GetPlayerPosition(i), true);
+	}
 }
 
 void Game::Run() {
@@ -116,6 +78,55 @@ void Game::Clear() {
 	objectManager.Clear();
 }
 
+GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
+	SDL_Surface* screen = window.GetScreen();
+
+	// Obiekt gracza
+	GameObject* player = new GameObject(Vector(20, 20), position, objectManager.GetAllObjects());
+	player->AddComponent(new SpriteRenderer(*player, screen, bitmaps.playerBmp));
+	objectManager.AddObject(player);
+
+	// Broñ
+	GameObject* basicWeapon = new GameObject(
+		Vector(30, 10),
+		player->GetPosition() + Vector(Direction::EAST) * player->GetSize().x,
+		objectManager.GetAllObjects()
+	);
+	basicWeapon->AddComponent(new Firearm(*basicWeapon, basicBullet, WPN_BASIC_RELOAD, FirearmType::Basic));
+	basicWeapon->AddComponent(new SpriteRenderer(*basicWeapon, screen, bitmaps.wpnBasicBmp));
+	player->AddChild(basicWeapon);
+	objectManager.AddObject(basicWeapon);
+
+	// Silna broñ
+	GameObject * superWeapon = new GameObject(
+		Vector(30, 10),
+		player->GetPosition() + Vector(Direction::EAST) * player->GetSize().x,
+		objectManager.GetAllObjects()
+	);
+	superWeapon->AddComponent(new Firearm(*superWeapon, superBullet, WPN_SUPER_RELOAD, FirearmType::Super));
+	superWeapon->AddComponent(new SpriteRenderer(*superWeapon, screen, bitmaps.wpnSuperBmp));
+	player->AddChild(superWeapon);
+	objectManager.AddObject(superWeapon);
+
+	// Ekwipunek
+	player->AddComponent(new PlayerEquipment(*player));
+	// Zdrowie
+	Health* playerHealth = new Health(*player, MAX_HEALTH);
+	player->AddComponent(playerHealth);
+	playerHealth->SubscribeDeath(
+		[&](Health* deadPlayer) {
+			printf("Dead\n");
+			objectManager.DestroyObject(&(deadPlayer->GetOwner()));
+		}
+	);
+
+	if (isControlled) {
+		player->AddComponent(new PlayerController(*player, 300.0f));
+	}
+
+	return player;
+}
+
 
 
 
@@ -145,4 +156,31 @@ GameBitmaps::~GameBitmaps() {
 
 bool GameBitmaps::IsOk() const {
 	return bitmapsOk;
+}
+
+
+
+GameStartInfo::GameStartInfo(Vector* playerPositions, size_t playerCount)
+	: playerPositions(playerPositions), playerCount(playerCount) {
+
+}
+
+GameStartInfo::GameStartInfo(GameStartInfo&& other)
+	: playerPositions(other.playerPositions), playerCount(other.playerCount) {
+	other.playerPositions = NULL;
+	other.playerCount = 0;
+}
+
+GameStartInfo::~GameStartInfo() {
+	if (playerPositions != NULL) {
+		delete[] playerPositions;
+	}
+}
+
+Vector GameStartInfo::GetPlayerPosition(int index) const {
+	return playerPositions[index];
+}
+
+size_t GameStartInfo::GetPlayerCount() const {
+	return playerCount;
 }

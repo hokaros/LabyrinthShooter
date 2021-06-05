@@ -7,13 +7,6 @@ extern "C" {
 
 #include "Vector.h"
 
-// narysowanie napisu txt na powierzchni screen, zaczynaj¹c od punktu (x, y)
-// charset to bitmapa 128x128 zawieraj¹ca znaki
-// draw a text txt on surface screen, starting from the point (x, y)
-// charset is a 128x128 bitmap containing character images
-void DrawString(SDL_Surface* screen, int x, int y, const char* text,
-	SDL_Surface* charset);
-
 // narysowanie na ekranie screen powierzchni sprite w punkcie (x, y)
 // (x, y) to punkt œrodka obrazka sprite na ekranie
 // draw a surface sprite on a surface screen in point (x, y)

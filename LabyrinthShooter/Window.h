@@ -24,6 +24,9 @@ public:
 
 	void RenderTexture(SDL_Texture* texture, const SDL_Rect& rect, double angle);
 
+	// narysowanie napisu txt na ekranie, zaczynaj¹c od punktu (x, y)
+	void DrawString(int x, int y, const char* text);
+
 	SDL_Surface* GetScreen() const;
 	SDL_Renderer* GetRenderer() const;
 
