@@ -141,8 +141,5 @@ bool Window::LoadCharsets() {
 
 	SDL_SetColorKey(charset, true, 0x000000);
 
-	// Wczytanie ró¿nych rozmiarów
-	//SDL_CreateRGBSurface(charset->flags, charset->w, charset->h, 8, charset->format->Rmask, charset->format->Gmask, charset->format->Bmask, charset->format->Amask);
-
 	return true;
 }

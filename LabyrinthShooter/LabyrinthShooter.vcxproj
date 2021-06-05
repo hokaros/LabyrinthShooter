@@ -39,6 +39,7 @@
     <ClInclude Include="RectangleRenderer.h" />
     <ClInclude Include="Regenerable.h" />
     <ClInclude Include="SpriteRenderer.h" />
+    <ClInclude Include="StatRenderer.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="GameRoom.h" />
@@ -65,6 +66,7 @@
     <ClCompile Include="RectangleRenderer.cpp" />
     <ClCompile Include="Regenerable.cpp" />
     <ClCompile Include="SpriteRenderer.cpp" />
+    <ClCompile Include="StatRenderer.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Vector.cpp" />
     <ClCompile Include="GameRoom.cpp" />

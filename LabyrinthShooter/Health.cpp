@@ -1,13 +1,16 @@
 #include "Health.h"
 
-Health::Health(GameObject& owner, int maxHealth)
-	: ObjectComponent(owner), maxHealth(maxHealth), currHealth(maxHealth) {
+Health::Health(GameObject& owner, int maxHealth, StatRenderer* healthRenderer)
+	: ObjectComponent(owner), maxHealth(maxHealth), currHealth(maxHealth), healthRenderer(healthRenderer) {
 
+	if (healthRenderer != NULL) {
+		healthRenderer->UpdateStat(currHealth);
+	}
 }
 
 ObjectComponent* Health::Copy(GameObject& newOwner)
 {
-	Health* health = new Health(newOwner, maxHealth);
+	Health* health = new Health(newOwner, maxHealth, NULL);
 	// Dodanie funkcji obs³ugi œmierci
 	for (function<void(Health*)> deathHandler : onDeath) {
 		health->SubscribeDeath(deathHandler);
@@ -18,6 +21,9 @@ ObjectComponent* Health::Copy(GameObject& newOwner)
 void Health::Hurt(int hp) {
 	currHealth -= hp;
 	printf("Ouch, curr = %d\n", currHealth);
+
+	if (healthRenderer != NULL)
+		healthRenderer->UpdateStat(currHealth);
 
 	if (currHealth <= 0) {
 		OnDeath();
@@ -34,4 +40,11 @@ void Health::OnDeath() {
 
 void Health::SubscribeDeath(function<void(Health*)> handler) {
 	onDeath.push_back(handler);
+}
+
+void Health::Update() {
+	// Wyœwietlenie informacji o zdrowiu
+	if (healthRenderer != NULL) {
+		healthRenderer->Render();
+	}
 }

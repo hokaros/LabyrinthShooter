@@ -35,6 +35,7 @@ public:
 	SDL_Surface* playerBmp;
 	SDL_Surface* wpnBasicBmp;
 	SDL_Surface* wpnSuperBmp;
+	SDL_Surface* heartBmp;
 
 public:
 	GameBitmaps();
@@ -49,16 +50,18 @@ private:
 
 struct GameStartInfo {
 public:
-	GameStartInfo(Vector* playerPositions, size_t playerCount);
+	GameStartInfo(Vector* playerPositions, size_t playerCount, int controllableIndex);
 	GameStartInfo(GameStartInfo&& other);
 	~GameStartInfo();
 
 	Vector GetPlayerPosition(int index) const;
 	size_t GetPlayerCount() const;
+	int GetControllableIndex() const;
 
 private:
 	Vector* playerPositions;
 	size_t playerCount;
+	int controllableIndex;
 };
 
 
@@ -81,6 +84,8 @@ private:
 	GameStartInfo startInfo;
 
 	GameBitmaps bitmaps;
+
+	BMPStats healthStats;
 
 	GameObject basicBullet; // TODO: przenieœæ prefaby do osobnej struktury
 	GameObject superBullet;

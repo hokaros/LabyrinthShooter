@@ -4,7 +4,8 @@ Game::Game(Window& window, GameStartInfo&& gameInfo)
 	: window(window),
 	basicBullet(Vector(4, 4), objectManager.GetAllObjects()), // uwa¿aæ przy zmienianiu objectManagera
 	superBullet(Vector(10, 10), objectManager.GetAllObjects()),
-	startInfo(std::move(gameInfo)) {
+	startInfo(std::move(gameInfo)),
+	healthStats(bitmaps.heartBmp, VectorInt(30, 30), VectorInt(3, 3)) {
 
 	SDL_Surface* screen = window.GetScreen();
 
@@ -19,10 +20,10 @@ Game::Game(Window& window, GameStartInfo&& gameInfo)
 }
 
 void Game::LoadStartingObjects() {
-	// TODO: pobieranie pozycji wejœciowej gracza
-
+	// Za³adowanie graczy
 	for (size_t i = 0; i < startInfo.GetPlayerCount(); i++) {
-		CreatePlayer(startInfo.GetPlayerPosition(i), true);
+		bool isControllable = startInfo.GetControllableIndex() == i;
+		CreatePlayer(startInfo.GetPlayerPosition(i), isControllable);
 	}
 }
 
@@ -111,7 +112,11 @@ GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
 	// Ekwipunek
 	player->AddComponent(new PlayerEquipment(*player));
 	// Zdrowie
-	Health* playerHealth = new Health(*player, MAX_HEALTH);
+	StatRenderer* healthRenderer = NULL;
+	if (isControlled) { // Wyœwietlamy zdrowie tylko gracza kontrolowanego przez tego klienta
+		healthRenderer = &healthStats;
+	}
+	Health* playerHealth = new Health(*player, MAX_HEALTH, healthRenderer);
 	player->AddComponent(playerHealth);
 	playerHealth->SubscribeDeath(
 		[&](Health* deadPlayer) {
@@ -136,14 +141,22 @@ GameBitmaps::GameBitmaps() {
 		printf("Nie udalo sie zaladowac resources/player.bmp\n");
 		bitmapsOk = false;
 	}
+
 	wpnBasicBmp = SDL_LoadBMP("resources/weapon_primary.bmp");
 	if (wpnBasicBmp == NULL) {
 		printf("Nie udalo sie zaladowac resources/weapon_primary.bmp\n");
 		bitmapsOk = false;
 	}
+
 	wpnSuperBmp = SDL_LoadBMP("resources/weapon_super.bmp");
 	if (wpnSuperBmp == NULL) {
 		printf("Nie udalo sie zaladowac resources/weapon_super.bmp\n");
+		bitmapsOk = false;
+	}
+
+	heartBmp = SDL_LoadBMP("resources/heart.bmp");
+	if (heartBmp == NULL) {
+		printf("Nie udalo sie zaladowac resources/heart.bmp\n");
 		bitmapsOk = false;
 	}
 }
@@ -160,13 +173,13 @@ bool GameBitmaps::IsOk() const {
 
 
 
-GameStartInfo::GameStartInfo(Vector* playerPositions, size_t playerCount)
-	: playerPositions(playerPositions), playerCount(playerCount) {
+GameStartInfo::GameStartInfo(Vector* playerPositions, size_t playerCount, int controllableIndex)
+	: playerPositions(playerPositions), playerCount(playerCount), controllableIndex(controllableIndex) {
 
 }
 
 GameStartInfo::GameStartInfo(GameStartInfo&& other)
-	: playerPositions(other.playerPositions), playerCount(other.playerCount) {
+	: playerPositions(other.playerPositions), playerCount(other.playerCount), controllableIndex(other.controllableIndex) {
 	other.playerPositions = NULL;
 	other.playerCount = 0;
 }
@@ -183,4 +196,8 @@ Vector GameStartInfo::GetPlayerPosition(int index) const {
 
 size_t GameStartInfo::GetPlayerCount() const {
 	return playerCount;
+}
+
+int GameStartInfo::GetControllableIndex() const {
+	return controllableIndex;
 }

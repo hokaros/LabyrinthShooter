@@ -49,14 +49,8 @@ void GameRoom::Enter() {
 
 		if (input.PressedThisFrame(SDLK_RETURN)) {
 			// Testowe wejœcie do gry
-			size_t pCount = 10;
-			float offset = 80;
-			Vector* playerPositions = new Vector[pCount];
-			for (size_t i = 0; i < pCount; i++) {
-				playerPositions[i] = Vector(50 + offset * i, 50);
-			}
 			SetNextGame(new Game(window, 
-				GameStartInfo(playerPositions, pCount))
+				GameStartInfo(new Vector[1]{ Vector(50, 200) }, 1, 0))
 			);
 			RunGame();
 		}
@@ -82,7 +76,7 @@ void GameRoom::StartGame(int selfId, Vector* playerPositions, size_t playerCount
 
 	Vector* positionsCpy = new Vector[playerCount];
 	std::memcpy(positionsCpy, playerPositions, playerCount);
-	GameStartInfo gameInfo(positionsCpy, playerCount);
+	GameStartInfo gameInfo(positionsCpy, playerCount, selfId);
 
 	std::lock_guard<std::mutex> lock(mutex);
 	nextGame = new Game(window, std::move(gameInfo));
