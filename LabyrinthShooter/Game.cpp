@@ -27,14 +27,14 @@ void Game::LoadStartingObjects() {
 	}
 }
 
-void Game::Run() {
+bool Game::Run() {
 	InputController* input = InputController::Main();
 
 	SDL_Surface* screen = window.GetScreen();
 	int black = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
 
 	Vector mapStart(10, 10);
-	LabyrinthSolidifier lab(mapStart, 10, 100, 5, 5, objectManager.GetAllObjects(), LAB_TIME);
+	LabyrinthSolidifier lab(mapStart, WALL_THICKNESS, WALL_LENGTH, LAB_X, LAB_Y, objectManager.GetAllObjects(), LAB_TIME);
 	for (int i = 0; i < lab.WallsCount(); i++) {
 		objectManager.AddUndestroyable(lab.GetWalls()[i]);
 	}
@@ -58,6 +58,10 @@ void Game::Run() {
 		timer.NextFrame();
 
 		if (!input->Update()) {
+			return false;
+		}
+
+		if (input->PressedThisFrame(SDLK_ESCAPE)) {
 			quit = 1;
 		}
 
@@ -73,6 +77,8 @@ void Game::Run() {
 
 		objectManager.DisposeDestroyed();
 	}
+
+	return true;
 }
 
 void Game::Clear() {

@@ -41,13 +41,13 @@ void GameRoom::Enter() {
 			startGame = false;
 		}
 
-		//if (input->PressedThisFrame(SDLK_RETURN)) {
-		//	// Testowe wejœcie do gry
-		//	SetNextGame(new Game(window, 
-		//		GameStartInfo(new Vector[1]{ Vector(50, 200) }, 1, 0))
-		//	);
-		//	RunGame();
-		//}
+		if (input->PressedThisFrame(SDLK_RETURN)) {
+			// Testowe wejœcie do gry
+			SetNextGame(new Game(window, 
+				GameStartInfo(new Vector[1]{ Vector(50, 200) }, 1, 0))
+			);
+			RunGame();
+		}
 		if (input->PressedThisFrame(SDLK_ESCAPE)) {
 			quit = true;
 		}
@@ -62,7 +62,7 @@ void GameRoom::DrawWaitingRoom() {
 	sprintf_s(buffer, "%d/%d", GetPlayerCount(), NEEDED_PLAYERS);
 	window.DrawString(5, 5, buffer, FONTSIZE_MEDIUM);
 
-	window.DrawString(window.GetWidth()/2 - 15*FONTSIZE_MEDIUM, window.GetHeight()/2 - FONTSIZE_MEDIUM, "Press enter to start the game", FONTSIZE_MEDIUM);
+	window.DrawString(window.GetWidth()/2 - 15*FONTSIZE_MEDIUM, window.GetHeight()/2 - FONTSIZE_MEDIUM, "Oczekiwanie na graczy...", FONTSIZE_MEDIUM);
 }
 
 void GameRoom::StartGame(int selfId, Vector* playerPositions, size_t playerCount) {

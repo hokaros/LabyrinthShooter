@@ -4,6 +4,7 @@
 #include "RectangleRenderer.h"
 #include "Regenerable.h"
 #include "Window.h"
+#include "ColliderMemory.h"
 
 #define WALL_REGEN 5.0
 
@@ -27,6 +28,7 @@ public:
 	Vector GetSize() const;
 
 	void ChangeLab();
+	const ColliderMemory& GetColliderMemory() const;
 
 	void Update();
 
@@ -41,6 +43,7 @@ private:
 	int yCount;
 
 	Labirynt labyrinth;
+	ColliderMemory colliderMemory;
 
 	const std::list<GameObject*>& allObjects;
 	GameObject** walls; // œciany podzielone na pionowe i poziome
@@ -59,5 +62,7 @@ private:
 	GameObject* BuildWall(const Vector& size, int color);
 	void BuildBorder();
 	GameObject** BuildGateWall(Direction side);
+
+	void OnWallDestroyedChanged(GameObject* wall);
 };
 

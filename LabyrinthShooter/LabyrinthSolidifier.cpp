@@ -8,7 +8,8 @@ LabyrinthSolidifier::LabyrinthSolidifier(const Vector& pos,
 	: position(pos), wallWidth(wallWidth), wallLength(wallLength),
 	xCount(xCount), yCount(yCount),
 	labyrinth(xCount, yCount), allObjects(allObjects),
-	changeTime(changeTime)
+	changeTime(changeTime),
+	colliderMemory(LabyrinthSize(wallWidth, wallLength, xCount, yCount).x + pos.x, LabyrinthSize(wallWidth, wallLength, xCount, yCount).y + pos.y)
 	{
 
 	SDL_Surface* screen = Window::Main()->GetScreen();
@@ -17,15 +18,18 @@ LabyrinthSolidifier::LabyrinthSolidifier(const Vector& pos,
 
 	// Stworzenie œcian
 	walls = new GameObject * [labyrinth.ActiveCount()];
+	function<void(GameObject*)> destroyedHandler = [this](GameObject* source) {OnWallDestroyedChanged(source); };
 	for (int i = 0; i < labyrinth.ActiveCount(); i++) {
 		walls[i] = BuildWall(Vector(wallWidth, wallLength));
 		walls[i]->isDestroyable = true;
+		walls[i]->SubscribeDestroyed(destroyedHandler);
 	}
 
 	PlaceWalls(); // wstawienie œcian w odpowiednie miejsca
 	BuildBorder();
 
-	labyrinth.PrintLab();
+	colliderMemory.Refresh(walls, labyrinth.ActiveCount());
+	labyrinth.PrintLab(); // wyœwietlenie w konsoli
 }
 
 IUpdateable* LabyrinthSolidifier::Copy() {
@@ -108,6 +112,12 @@ void LabyrinthSolidifier::PlaceWalls() {
 void LabyrinthSolidifier::ChangeLab() {
 	labyrinth.ChangeLab();
 	PlaceWalls();
+
+	colliderMemory.Refresh(walls, labyrinth.ActiveCount());
+}
+
+const ColliderMemory& LabyrinthSolidifier::GetColliderMemory() const {
+	return colliderMemory;
 }
 
 GameObject* LabyrinthSolidifier::BuildWall(const Vector& size) {
@@ -201,5 +211,14 @@ void LabyrinthSolidifier::Update() {
 	if (timeSinceLastChange >= changeTime) {
 		ChangeLab();
 		timeSinceLastChange = 0;
+	}
+}
+
+void LabyrinthSolidifier::OnWallDestroyedChanged(GameObject* wall) {
+	if (wall->IsDestroyed()) {
+		colliderMemory.Free(wall);
+	}
+	else {
+		colliderMemory.Claim(wall);
 	}
 }

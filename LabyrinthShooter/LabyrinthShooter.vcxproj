@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Cage.h" />
+    <ClInclude Include="ColliderMemory.h" />
     <ClInclude Include="ConstantMover.h" />
     <ClInclude Include="Draw.h" />
     <ClInclude Include="Firearm.h" />
@@ -49,6 +50,7 @@
   <ItemGroup>
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Cage.cpp" />
+    <ClCompile Include="ColliderMemory.cpp" />
     <ClCompile Include="ConstantMover.cpp" />
     <ClCompile Include="Draw.cpp" />
     <ClCompile Include="Firearm.cpp" />

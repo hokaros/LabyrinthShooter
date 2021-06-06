@@ -1,4 +1,5 @@
 #include "SpriteRenderer.h"
+#include "Draw.h"
 
 SpriteRenderer::SpriteRenderer(GameObject& owner, SDL_Surface* screen, SDL_Surface* sprite)
 	: ObjectRenderer(owner, screen), sprite(sprite) {

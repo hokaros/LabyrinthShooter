@@ -229,11 +229,24 @@ bool GameObject::CollidesWithAny() const {
 	return false;
 }
 
+std::vector<VectorInt>* GameObject::GetPixels() const {
+	std::vector<VectorInt>* pixels = new std::vector<VectorInt>();
+
+	for (int x = 0; x < size.x; x++) {
+		for (int y = 0; y < size.y; y++) {
+			pixels->push_back(position + Vector(x, y));
+		} 
+	}
+
+	return pixels;
+}
+
 void GameObject::SetDestroyed(bool destroyed) {
 	isEnabled = !destroyed;
 
-	if (destroyed && onDestroyed) {
-		onDestroyed();
+	for (function<void(GameObject*)> handler : onDestroyedChanged) {
+		if (handler)
+			handler(this);
 	}
 }
 
@@ -251,6 +264,10 @@ bool GameObject::IsDestroyed() const {
 
 bool GameObject::IsEnabled() const {
 	return isEnabled;
+}
+
+void GameObject::SubscribeDestroyed(function<void(GameObject*)> handler) {
+	onDestroyedChanged.push_back(handler);
 }
 
 bool GameObject::DoesIntersect(const GameObject& other) const {

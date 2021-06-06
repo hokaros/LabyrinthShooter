@@ -2,7 +2,7 @@
 
 Regenerable::Regenerable(GameObject& owner, double regenerationTime)
 	: ObjectComponent(owner), regenerationTime(regenerationTime) {
-	gameObject.onDestroyed = [this] () {OnDestroyed(); };
+	gameObject.SubscribeDestroyed([this](GameObject*) {OnDestroyed(); });
 }
 
 void Regenerable::Update() {
@@ -10,6 +10,9 @@ void Regenerable::Update() {
 }
 
 void Regenerable::OnDestroyed() {
+	if (!gameObject.IsDestroyed())
+		return; // tylko zniszczenie
+
 	Timer::Main()->Invoke([this]() {
 		gameObject.SetDestroyed(false);
 		}, regenerationTime);

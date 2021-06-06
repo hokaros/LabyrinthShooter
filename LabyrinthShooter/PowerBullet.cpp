@@ -13,7 +13,7 @@ void PowerBullet::OnCollision(GameObject& collider) {
 	if (collider.isDestroyable) {
 		collider.SetDestroyed(true);
 
-		DecreaseHealth(); // TODO: zamieniæ na zmniejszanie si³y wraz z przebytym dystansem
+		DecreaseHealth();
 	}
 	else {
 		Bullet::OnCollision(collider);

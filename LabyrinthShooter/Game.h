@@ -19,6 +19,10 @@
 #include "Health.h"
 
 #define LAB_TIME 0.5
+#define LAB_X 7
+#define LAB_Y 5
+#define WALL_THICKNESS 10
+#define WALL_LENGTH 100
 
 #define BULLET_BASIC_SPEED 1000
 #define BULLET_BASIC_DAMAGE 1
@@ -71,8 +75,8 @@ class Game
 public:
 	Game(Window& window, GameStartInfo&& gameInfo);
 
-	// G³ówna pêtla gry
-	void Run();
+	// G³ówna pêtla gry. Zwraca fa³sz, jeœli w trakcie u¿ytkownik zamknie okno
+	bool Run();
 
 	// Usuwa wszystkie obiekty
 	void Clear();

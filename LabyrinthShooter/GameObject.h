@@ -18,7 +18,6 @@ public:
 	bool isDestroyable = false;
 
 	std::function<void(GameObject& collider)> onCollision;
-	std::function<void()> onDestroyed;
 public:
 	GameObject(const std::list<GameObject*>& allObjects);
 	GameObject(const Vector& size, const std::list<GameObject*>& allObjects);
@@ -49,12 +48,15 @@ public:
 	Vector GetMiddle() const;
 	bool Collides(const GameObject& other) const;
 	bool CollidesWithAny() const;
+	// Piksele, w których ten obiekt ma collidera
+	std::vector<VectorInt>* GetPixels() const;
 
 	// Odwracalne zniszczenie obiektu
 	void SetDestroyed(bool destroyed);
 	void SetEnabled(bool enabled);
 	bool IsDestroyed() const;
 	bool IsEnabled() const;
+	void SubscribeDestroyed(function<void(GameObject*)> handler);
 
 	void SetPosition(const Vector& newPosition);
 	void Translate(const Vector& offset); // przesuniêcie
@@ -85,6 +87,8 @@ private:
 
 	GameObject* parent = NULL;
 	std::list<GameObject*> children;
+
+	std::list<function<void(GameObject*)>> onDestroyedChanged;
 
 	const std::list<GameObject*>& allObjects;
 private:
