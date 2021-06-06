@@ -28,6 +28,11 @@ LabyrinthSolidifier::LabyrinthSolidifier(const Vector& pos,
 	PlaceWalls(); // wstawienie œcian w odpowiednie miejsca
 	BuildBorder();
 
+	// Skrajne œciany zawsze widoczne
+	for (int i = 0; i < borderCount; i++) {
+		border[i]->renderUnseen = true;
+	}
+
 	colliderMemory.Refresh(walls, labyrinth.ActiveCount());
 	labyrinth.PrintLab(); // wyœwietlenie w konsoli
 }

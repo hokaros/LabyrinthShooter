@@ -11,6 +11,7 @@
 class GameObject
 {
 public:
+	bool renderUnseen = false;
 	// Czy obiekt ignoruje dzia³aj¹ce na niego si³y
 	bool isStatic = false;
 	bool collisionEnabled = true;

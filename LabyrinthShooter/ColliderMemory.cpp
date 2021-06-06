@@ -5,13 +5,13 @@
 ColliderMemory::ColliderMemory(size_t width, size_t height)
 	: width(width), height(height) {
 
-	memory = new bool* [width];
+	memory = new GameObject** [width];
 
 	for (size_t x = 0; x < width; x++) {
-		memory[x] = new bool[height];
+		memory[x] = new GameObject*[height];
 
 		for (size_t y = 0; y < height; y++) {
-			memory[x][y] = false;
+			memory[x][y] = NULL;
 		}
 	}
 }
@@ -28,35 +28,38 @@ void ColliderMemory::Refresh(GameObject** objects, size_t count) {
 	Clear();
 
 	for (size_t i = 0; i < count; i++) {
-		Claim(objects[i]);
+		if (!objects[i]->IsDestroyed()) {
+			Claim(objects[i]);
+		}
 	}
 }
 
 void ColliderMemory::Clear() {
 	for (size_t x = 0; x < width; x++) {
 		for (size_t y = 0; y < height; y++) {
-			memory[x][y] = false;
+			memory[x][y] = NULL;
 		}
 	}
 }
 
 void ColliderMemory::Claim(GameObject* collider) {
-	SetForCollider(collider, true);
+	SetForCollider(collider, collider);
 }
 
 
 void ColliderMemory::Free(GameObject* collider) {
-	SetForCollider(collider, false);
+	printf("Freeing\n");
+	SetForCollider(collider, NULL);
 }
 
-void ColliderMemory::SetForCollider(GameObject* collider, bool occupied) {
+void ColliderMemory::SetForCollider(GameObject* collider, GameObject* occupier) {
 	std::vector<VectorInt>* pixels = collider->GetPixels();
 
 	for (VectorInt pixel : *pixels) {
 		if (pixel.x >= 0 && pixel.x < width
 			&& pixel.y >= 0 && pixel.y < height) {
 
-			memory[pixel.x][pixel.y] = occupied;
+			memory[pixel.x][pixel.y] = occupier;
 		}
 	}
 }
@@ -65,10 +68,10 @@ bool ColliderMemory::IsOccupied(const VectorInt& point) const {
 	if (point.x < 0 || point.x >= width || point.y < 0 || point.y >= height)
 		return false;
 
-	return memory[point.x][point.y];
+	return memory[point.x][point.y] != NULL && memory[point.x][point.y]->IsEnabled();
 }
 
-bool ColliderMemory::Raycast(const VectorInt& start, const VectorInt& end) const {
+bool ColliderMemory::Raycast(const VectorInt& start, const VectorInt& end, GameObject* ignore) const {
 	Vector dPos = (Vector)end - start;
 	Vector dPosPart = dPos;
 	dPosPart.Normalize();
@@ -77,10 +80,8 @@ bool ColliderMemory::Raycast(const VectorInt& start, const VectorInt& end) const
 
 	while (curr.LengthSquared() < dPos.LengthSquared()) {
 		VectorInt point(start + (VectorInt)curr);
-		// Test
-		DrawPixel(Window::Main()->GetScreen(), point.x, point.y, SDL_MapRGB(Window::Main()->GetScreen()->format, 0xFF, 0x00, 0x00));
 
-		if (IsOccupied(point))
+		if (IsOccupied(point) && (ignore == NULL || memory[point.x][point.y] != ignore))
 			return true;
 
 		curr += dPosPart;

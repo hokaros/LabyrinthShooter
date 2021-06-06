@@ -172,12 +172,17 @@ void RoomFinder::EnterSearch() {
 	bool quit = false;
 
 	while (!quit) {
-		if (ShouldEnter()) {
-			RealEnterGameRoom();
-		}
 
 		if (!input->Update()) {
 			quit = 1;
+		}
+
+		if (input->PressedThisFrame(SDLK_RETURN)) {
+			// Testowa próba po³¹czenia z serwerem
+			TryConnect(textBox.GetContent());
+		}
+		else if (input->PressedThisFrame(SDLK_ESCAPE)) {
+			quit = true;
 		}
 
 		// Generowanie t³a
@@ -188,15 +193,12 @@ void RoomFinder::EnterSearch() {
 		// Wyœwietlenie wyszukiwarki
 		Draw(textBox);
 
-		if (input->PressedThisFrame(SDLK_RETURN)) {
-			// Próba po³¹czenia z serwerem
-			TryConnect(textBox.GetContent());
-		}
-		else if (input->PressedThisFrame(SDLK_ESCAPE)) {
-			quit = true;
-		}
-
 		window.Render();
+
+
+		if (ShouldEnter()) {
+			RealEnterGameRoom();
+		}
 	}
 }
 

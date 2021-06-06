@@ -85,15 +85,32 @@ bool Game::Run() {
 		for (GameObject* go : objectManager.GetAllObjects()) {
 			go->Update();
 		}
-		lab.Update();
 
 		// Renderowanie obiektów
 		for (GameObject* go : objectManager.GetAllObjects()) {
-			go->RenderUpdate();
+			if (go->renderUnseen) {
+				go->RenderUpdate();
+				continue;
+			}
+
+			// Wyœwietlanie tylko, jeœli obiekt jest widziany przez obecnego gracza
+			if ((go->GetPosition() - controlledPlayer->GetPosition()).LengthSquared() > PLAYER_SIGHT * PLAYER_SIGHT)
+				continue;  // zbyt daleko
+
+			// Sprawdzenie, czy œciana stoi na drodze
+			bool canSee = !lab.GetColliderMemory().Raycast(
+				controlledPlayer->GetMiddle(),
+				go->GetMiddle(),
+				go
+			);
+			if (canSee) {
+				go->RenderUpdate();
+			}
 		}
 		// Renderowanie nak³adek UI
 		healthStats.Render();
 
+		lab.Update();
 		window.Render();
 
 		objectManager.DisposeDestroyed();

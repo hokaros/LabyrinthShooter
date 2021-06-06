@@ -82,6 +82,9 @@ void GameObject::Update() {
 }
 
 void GameObject::RenderUpdate() {
+	if (!isEnabled)
+		return;
+
 	if (renderer != NULL)
 		renderer->RenderUpdate();
 }

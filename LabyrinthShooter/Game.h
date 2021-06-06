@@ -18,7 +18,8 @@
 #include "Firearm.h"
 #include "Health.h"
 
-#define LAB_TIME 0.5
+// Czas, co jaki zmienia siê labirynt
+#define LAB_TIME 2
 #define LAB_X 7
 #define LAB_Y 5
 #define WALL_THICKNESS 10
@@ -33,6 +34,8 @@
 
 #define MAX_HEALTH 3
 #define PLAYER_SPEED 300.0
+
+#define PLAYER_SIGHT 400
 
 
 struct GameBitmaps {
