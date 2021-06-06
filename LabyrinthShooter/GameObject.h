@@ -34,10 +34,12 @@ public:
 	// Znajduje wszystkie komponenty okreœlonego typu u dzieci
 	template<class T>
 	std::list<T*>* FindComponentsInChildren();
+	void SetRenderer(IUpdateable* renderer);
 	
 
 	// Raz na klatkê
 	void Update();
+	void RenderUpdate();
 	// Na pocz¹tku gry
 	void Start();
 
@@ -76,6 +78,7 @@ public:
 	~GameObject();
 protected:
 	std::list<IUpdateable*> components;
+	IUpdateable* renderer;
 
 	bool insideOutCollision = false;
 private:

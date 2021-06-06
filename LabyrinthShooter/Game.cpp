@@ -13,10 +13,10 @@ Game::Game(Window& window, GameStartInfo&& gameInfo)
 	int yellow = SDL_MapRGB(screen->format, 0xFF, 0xFF, 0x00);
 
 	basicBullet.AddComponent(new Bullet(basicBullet, BULLET_BASIC_SPEED, BULLET_BASIC_DAMAGE));
-	basicBullet.AddComponent(new RectangleRenderer(basicBullet, screen, yellow, yellow));
+	basicBullet.SetRenderer(new RectangleRenderer(basicBullet, screen, yellow, yellow));
 
 	superBullet.AddComponent(new PowerBullet(superBullet, BULLET_SUPER_SPEED, BULLET_SUPER_DAMAGE));
-	superBullet.AddComponent(new RectangleRenderer(superBullet, screen, red, red));
+	superBullet.SetRenderer(new RectangleRenderer(superBullet, screen, red, red));
 }
 
 Game::~Game() {
@@ -87,6 +87,13 @@ bool Game::Run() {
 		}
 		lab.Update();
 
+		// Renderowanie obiektów
+		for (GameObject* go : objectManager.GetAllObjects()) {
+			go->RenderUpdate();
+		}
+		// Renderowanie nak³adek UI
+		healthStats.Render();
+
 		window.Render();
 
 		objectManager.DisposeDestroyed();
@@ -104,7 +111,7 @@ GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
 
 	// Obiekt gracza
 	GameObject* player = new GameObject(Vector(20, 20), position, objectManager.GetAllObjects());
-	player->AddComponent(new SpriteRenderer(*player, screen, bitmaps.playerBmp));
+	player->SetRenderer(new SpriteRenderer(*player, screen, bitmaps.playerBmp));
 	player->AddComponent(new ConstantMover(*player, PLAYER_SPEED));
 	objectManager.AddObject(player);
 
@@ -115,7 +122,7 @@ GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
 		objectManager.GetAllObjects()
 	);
 	basicWeapon->AddComponent(new Firearm(*basicWeapon, basicBullet, WPN_BASIC_RELOAD, FirearmType::Basic));
-	basicWeapon->AddComponent(new SpriteRenderer(*basicWeapon, screen, bitmaps.wpnBasicBmp));
+	basicWeapon->SetRenderer(new SpriteRenderer(*basicWeapon, screen, bitmaps.wpnBasicBmp));
 	player->AddChild(basicWeapon);
 	objectManager.AddObject(basicWeapon);
 
@@ -126,7 +133,7 @@ GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
 		objectManager.GetAllObjects()
 	);
 	superWeapon->AddComponent(new Firearm(*superWeapon, superBullet, WPN_SUPER_RELOAD, FirearmType::Super));
-	superWeapon->AddComponent(new SpriteRenderer(*superWeapon, screen, bitmaps.wpnSuperBmp));
+	superWeapon->SetRenderer(new SpriteRenderer(*superWeapon, screen, bitmaps.wpnSuperBmp));
 	player->AddChild(superWeapon);
 	objectManager.AddObject(superWeapon);
 

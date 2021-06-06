@@ -41,10 +41,3 @@ void Health::OnDeath() {
 void Health::SubscribeDeath(function<void(Health*)> handler) {
 	onDeath.push_back(handler);
 }
-
-void Health::Update() {
-	// Wyœwietlenie informacji o zdrowiu
-	if (healthRenderer != NULL) {
-		healthRenderer->Render();
-	}
-}

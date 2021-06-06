@@ -13,8 +13,6 @@ public:
 
 	void Hurt(int hp);
 
-	void Update() override;
-
 	// Obs³ugiwanie œmierci z argumentem tego komponentu
 	void SubscribeDeath(function<void(Health*)> handler);
 

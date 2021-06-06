@@ -6,6 +6,6 @@ ObjectRenderer::ObjectRenderer(GameObject& owner, SDL_Surface* screen)
 
 }
 
-void ObjectRenderer::Update() {
+void ObjectRenderer::RenderUpdate() {
 	Render(screen);
 }
