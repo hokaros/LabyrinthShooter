@@ -1,8 +1,11 @@
 #include "GameRoom.h"
 
-GameRoom::GameRoom(Window& window)
-	: window(window), playerCount(1) {
+GameRoom::GameRoom(Window& window, Client* client)
+	: window(window), playerCount(1), client(client) {
 
+	client->onPlayerJoined = [this]() {OnPlayerJoined(); };
+	client->onPlayerLeft = [this]() {OnPlayerLeft(); };
+	client->onGameStarted = [this](int selfId, float positions[PLAYERS_NUM][2], bool* walls) {OnGameStarted(selfId, positions, walls); };
 }
 
 void GameRoom::Enter() {
@@ -38,21 +41,19 @@ void GameRoom::Enter() {
 			startGame = false;
 		}
 
-		if (input->PressedThisFrame(SDLK_RETURN)) {
-			// Testowe wejœcie do gry
-			SetNextGame(new Game(window, 
-				GameStartInfo(new Vector[1]{ Vector(50, 200) }, 1, 0))
-			);
-			RunGame();
-		}
-		else if (input->PressedThisFrame(SDLK_ESCAPE)) {
+		//if (input->PressedThisFrame(SDLK_RETURN)) {
+		//	// Testowe wejœcie do gry
+		//	SetNextGame(new Game(window, 
+		//		GameStartInfo(new Vector[1]{ Vector(50, 200) }, 1, 0))
+		//	);
+		//	RunGame();
+		//}
+		if (input->PressedThisFrame(SDLK_ESCAPE)) {
 			quit = true;
 		}
 
 		window.Render();
 	}
-
-	// TODO: roz³¹czenie z serwerem
 }
 
 void GameRoom::DrawWaitingRoom() {
@@ -68,7 +69,7 @@ void GameRoom::StartGame(int selfId, Vector* playerPositions, size_t playerCount
 	this->playerCount = playerCount;
 
 	Vector* positionsCpy = new Vector[playerCount];
-	std::memcpy(positionsCpy, playerPositions, playerCount);
+	std::memcpy(positionsCpy, playerPositions, playerCount * sizeof(Vector));
 	GameStartInfo gameInfo(positionsCpy, playerCount, selfId);
 
 	std::lock_guard<std::mutex> lock(mutex);
@@ -125,11 +126,32 @@ void GameRoom::SetNextGame(Game* newGame) {
 	nextGame = newGame;
 }
 
+void GameRoom::OnPlayerJoined() {
+	SetPlayerCount(GetPlayerCount() + 1);
+}
+
+void GameRoom::OnPlayerLeft() {
+	SetPlayerCount(GetPlayerCount() - 1);
+}
+
+void GameRoom::OnGameStarted(int selfId, float positions[PLAYERS_NUM][2], bool* walls) {
+	Vector playerPositions[PLAYERS_NUM];
+	for (int i = 0; i < PLAYERS_NUM; i++) {
+		playerPositions[i] = Vector(positions[i][0], positions[i][1]);
+	}
+	StartGame(selfId, playerPositions, PLAYERS_NUM);
+}
 
 
 RoomFinder::RoomFinder(Window& window)
 	: window(window) {
 
+}
+
+RoomFinder::~RoomFinder() {
+	if (client != NULL) {
+		delete client;
+	}
 }
 
 void RoomFinder::EnterSearch() {
@@ -150,6 +172,10 @@ void RoomFinder::EnterSearch() {
 	bool quit = false;
 
 	while (!quit) {
+		if (ShouldEnter()) {
+			RealEnterGameRoom();
+		}
+
 		if (!input->Update()) {
 			quit = 1;
 		}
@@ -163,10 +189,8 @@ void RoomFinder::EnterSearch() {
 		Draw(textBox);
 
 		if (input->PressedThisFrame(SDLK_RETURN)) {
-			// Testowe wejœcie do poczekalni
-			// TODO: próba po³¹czenia z serwerem
-			GameRoom gameRoom(window);
-			gameRoom.Enter();
+			// Próba po³¹czenia z serwerem
+			TryConnect(textBox.GetContent());
 		}
 		else if (input->PressedThisFrame(SDLK_ESCAPE)) {
 			quit = true;
@@ -174,6 +198,53 @@ void RoomFinder::EnterSearch() {
 
 		window.Render();
 	}
+}
+
+void RoomFinder::EnterGameRoom() {
+	std::lock_guard<std::mutex> lock(mutex);
+
+	shouldEnter = true;
+}
+
+void RoomFinder::RealEnterGameRoom() {
+	GameRoom gameRoom(window, client);
+	SetCurrentRoom(&gameRoom);
+
+	gameRoom.Enter();
+
+	// Po wyjœciu z pokoju
+	client->Disconnect();
+	SetCurrentRoom(NULL);
+}
+
+GameRoom* RoomFinder::GetCurrentRoom() {
+	std::lock_guard<std::mutex> lock(mutex);
+
+	return currentRoom;
+}
+
+void RoomFinder::SetCurrentRoom(GameRoom* newRoom) {
+	std::lock_guard<std::mutex> lock(mutex);
+
+	currentRoom = newRoom;
+}
+
+void RoomFinder::TryConnect(std::string ip) {
+	if (client != NULL)
+		delete client;
+
+	client = new Client(ip.c_str(), DEFAULT_PORT);
+	client->onJoinAccepted = [this]() {EnterGameRoom(); };
+	client->Connect();
+	client->GameProtocol();
+}
+
+bool RoomFinder::ShouldEnter() {
+	std::lock_guard<std::mutex> lock(mutex);
+
+	bool should = shouldEnter;
+	shouldEnter = false;
+	return should;
 }
 
 void RoomFinder::Draw(TextBox& textBox) {

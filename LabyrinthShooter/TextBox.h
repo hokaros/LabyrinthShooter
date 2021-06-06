@@ -20,6 +20,8 @@ public:
 	void AddCharacter(char character);
 	void RemoveLast();
 
+	std::string GetContent() const;
+
 private:
 	SDL_Rect rect;
 	Uint32 outline;

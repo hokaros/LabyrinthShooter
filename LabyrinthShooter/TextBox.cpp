@@ -66,3 +66,14 @@ void TextBox::RemoveLast() {
 
 	content.pop_back();
 }
+
+std::string TextBox::GetContent() const {
+	char buffer[32];
+	int i = 0;
+	for (char c : content) {
+		buffer[i++] = c;
+	}
+	buffer[i] = '\0';
+
+	return std::string(buffer);
+}

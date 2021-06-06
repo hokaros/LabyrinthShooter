@@ -2,6 +2,7 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <SDL_main.h>
+#include <client.h>
 #include "GameRoom.h"
 
 #define SCREEN_WIDTH 800
