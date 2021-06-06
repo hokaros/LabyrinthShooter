@@ -73,6 +73,10 @@ float Vector::Length() const {
 	return sqrtf(x * x + y * y);
 }
 
+float Vector::LengthSquared() const {
+	return x * x + y * y;
+}
+
 
 Vector operator+(const Vector& left, const Vector& right) {
 	Vector result;

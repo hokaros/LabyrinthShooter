@@ -19,11 +19,25 @@ Game::Game(Window& window, GameStartInfo&& gameInfo)
 	superBullet.AddComponent(new RectangleRenderer(superBullet, screen, red, red));
 }
 
+Game::~Game() {
+	if (players != NULL) {
+		delete[] players; // usuniêcie tablicy wskaŸników
+	}
+}
+
 void Game::LoadStartingObjects() {
 	// Za³adowanie graczy
-	for (size_t i = 0; i < startInfo.GetPlayerCount(); i++) {
+	playerCount = startInfo.GetPlayerCount();
+	players = new GameObject * [playerCount];
+
+	for (size_t i = 0; i < playerCount; i++) {
 		bool isControllable = startInfo.GetControllableIndex() == i;
-		CreatePlayer(startInfo.GetPlayerPosition(i), isControllable);
+		GameObject* newPlayer = CreatePlayer(startInfo.GetPlayerPosition(i), isControllable);
+
+		players[i] = newPlayer;
+		if (isControllable) {
+			controlledPlayer = newPlayer;
+		}
 	}
 }
 

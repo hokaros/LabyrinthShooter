@@ -1,4 +1,6 @@
 #include "ColliderMemory.h"
+#include "Window.h"
+#include "Draw.h"
 
 ColliderMemory::ColliderMemory(size_t width, size_t height)
 	: width(width), height(height) {
@@ -64,6 +66,27 @@ bool ColliderMemory::IsOccupied(const VectorInt& point) const {
 		return false;
 
 	return memory[point.x][point.y];
+}
+
+bool ColliderMemory::Raycast(const VectorInt& start, const VectorInt& end) const {
+	Vector dPos = (Vector)end - start;
+	Vector dPosPart = dPos;
+	dPosPart.Normalize();
+
+	Vector curr;
+
+	while (curr.LengthSquared() < dPos.LengthSquared()) {
+		VectorInt point(start + (VectorInt)curr);
+		// Test
+		DrawPixel(Window::Main()->GetScreen(), point.x, point.y, SDL_MapRGB(Window::Main()->GetScreen()->format, 0xFF, 0x00, 0x00));
+
+		if (IsOccupied(point))
+			return true;
+
+		curr += dPosPart;
+	}
+
+	return false;
 }
 
 size_t ColliderMemory::GetWidth() const {

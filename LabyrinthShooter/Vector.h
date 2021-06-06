@@ -35,6 +35,7 @@ public:
     // Sprawia, ¿e x <= y
     void Sort();
     float Length() const;
+    float LengthSquared() const;
     // Obraca o k¹t w radianach
     void Rotate(float angle);
     // Zwraca k¹t w radianach wskazywany przez wektor

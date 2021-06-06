@@ -74,6 +74,7 @@ class Game
 {
 public:
 	Game(Window& window, GameStartInfo&& gameInfo);
+	~Game();
 
 	// G³ówna pêtla gry. Zwraca fa³sz, jeœli w trakcie u¿ytkownik zamknie okno
 	bool Run();
@@ -85,6 +86,9 @@ private:
 	Window& window;
 	Timer timer;
 	ObjectManager objectManager;
+	GameObject** players = NULL;
+	size_t playerCount = 0;
+	GameObject* controlledPlayer = NULL;
 
 	GameStartInfo startInfo;
 

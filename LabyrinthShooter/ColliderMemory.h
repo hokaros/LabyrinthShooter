@@ -14,6 +14,8 @@ public:
 	void Free(GameObject* collider);
 
 	bool IsOccupied(const VectorInt& point) const;
+	// Czy jakiekolwiek pole jest zajête na linii od start do end
+	bool Raycast(const VectorInt& start, const VectorInt& end) const;
 	size_t GetWidth() const;
 	size_t GetHeight() const;
 
