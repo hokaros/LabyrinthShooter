@@ -40,6 +40,7 @@
     <ClInclude Include="PowerBullet.h" />
     <ClInclude Include="RectangleRenderer.h" />
     <ClInclude Include="Regenerable.h" />
+    <ClInclude Include="Shared.h" />
     <ClInclude Include="SpriteRenderer.h" />
     <ClInclude Include="StatRenderer.h" />
     <ClInclude Include="TextBox.h" />

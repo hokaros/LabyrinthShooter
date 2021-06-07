@@ -4,8 +4,6 @@
 #include "ObjectManager.h"
 #include "Bullet.h"
 
-enum class FirearmType {Basic, Super};
-
 class Firearm :
 	public ObjectComponent
 {
@@ -14,7 +12,7 @@ public:
 
 	void Update() override;
 	// Strzela, jeœli prze³adowano
-	void TryShoot();
+	bool TryShoot();
 
 	FirearmType GetType() const;
 

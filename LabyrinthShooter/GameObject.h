@@ -4,6 +4,7 @@
 #include "IUpdateable.h"
 #include <functional>
 #include <math.h>
+#include <mutex>
 
 #include <list>
 #define BUMPOUT_SPEED 10000.0
@@ -65,6 +66,7 @@ public:
 	void Translate(const Vector& offset); // przesuniêcie
 	void SetSize(const Vector& newSize);
 	void Rotate(double angle);
+	void SetRotation(double rotation);
 	// Obraca tak, aby oœ X obiektu by³a skierowana w stronê danego punktu
 	void LookAt(const Vector& point);
 
@@ -89,12 +91,17 @@ private:
 	Vector position;
 	double rotation = 0.0;
 
+	double asyncRotation = 0.0;
+
 	GameObject* parent = NULL;
 	std::list<GameObject*> children;
 
 	std::list<function<void(GameObject*)>> onDestroyedChanged;
 
 	const std::list<GameObject*>& allObjects;
+
+	std::mutex rotationMutex;
+
 private:
 	void HandleCollisions();
 	// Wypycha inny obiekt podczas kolizji

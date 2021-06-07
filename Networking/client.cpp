@@ -59,7 +59,7 @@ bool Client::IsConnected() {
 	return !disconnected;
 }
 
-bool Client::Send(Message<WildMessage>& msg)
+bool Client::Send(const Message<WildMessage>& msg)
 {
 	if (connectionHandler == NULL) {
 		return false;
@@ -86,6 +86,8 @@ void Client::OnMessageReceived(const Message<WildMessage>& message) {
 	WildMessage msgType = message.header.id;
 	Message<WildMessage> msg = message;
 
+	int id;
+
 	switch (msgType)
 	{
 	case WildMessage::WRITE:
@@ -96,8 +98,6 @@ void Client::OnMessageReceived(const Message<WildMessage>& message) {
 			std::cout << "\n" << from_msg << "\n";
 		}
 		break;
-	case WildMessage::PLAYER_DEATH:
-		break;
 	case WildMessage::WALL_DESTRUCTION:
 		break;
 	case WildMessage::LABIRYNTH_CHANGE:
@@ -106,13 +106,43 @@ void Client::OnMessageReceived(const Message<WildMessage>& message) {
 		break;
 	case WildMessage::POSITION:
 		break;
-	case WildMessage::NEW_DIRECTION:
+	case WildMessage::PLAYER_DEATH:
+		msg >> id;
+
+		if (onPlayerDead)
+			onPlayerDead(id);
 		break;
-	case WildMessage::WEAPON_CHANGE:
+	case WildMessage::NEW_DIRECTION: {
+		// Odebranie kierunku, w którym zacz¹³ siê poruszaæ gracz i jego id
+		Vector dir;
+		msg >> id >> dir;
+
+		if (onDirectionChanged)
+			onDirectionChanged(id, dir);
 		break;
-	case WildMessage::CHANGE_OF_AIMING_DIRECTION:
+	}
+	case WildMessage::WEAPON_CHANGE: {
+		FirearmType newType;
+
+		msg >> id >> newType;
+
+		if (onWeaponChanged)
+			onWeaponChanged(id, newType);
 		break;
+	}
+	case WildMessage::CHANGE_OF_AIMING_DIRECTION: {
+		double rotation;
+		msg >> id >> rotation;
+
+		if (onAimChanged)
+			onAimChanged(id, rotation);
+		break;
+	}
 	case WildMessage::SHOT:
+		msg >> id;
+
+		if (onShot)
+			onShot(id);
 		break;
 	case WildMessage::JOIN_REQUEST:
 		break;
@@ -206,28 +236,25 @@ Message<WildMessage> Client::CreateMessageLabirynthChange(bool* change, int size
 	message << id;
 	message << pos;
 	return message;
-};
-Message<WildMessage> Client::CreateMessageNewDirection(Vector direction, int id) {
+};*/
+Message<WildMessage> Client::CreateMessageNewDirection(Vector direction) {
 
 	Message<WildMessage> message;
 	message.header.id = WildMessage::NEW_DIRECTION;
-	message << id;
 	message << direction;
 	return message;
 };
-Message<WildMessage> Client::CreateMessageWeaponChange(WeaponType type, int id) {
+Message<WildMessage> Client::CreateMessageWeaponChange(FirearmType type) {
 
 	Message<WildMessage> message;
 	message.header.id = WildMessage::WEAPON_CHANGE;
-	message << id;
 	message << type;
 	return message;
-};*/
-Message<WildMessage> Client::CreateMessageChangeOfAimingDirection(float aimDir, int id) {
+};
+Message<WildMessage> Client::CreateMessageChangeOfAimingDirection(double aimDir) {
 
 	Message<WildMessage> message;
 	message.header.id = WildMessage::CHANGE_OF_AIMING_DIRECTION;
-	message << id;
 	message << aimDir;
 	return message;
 };
@@ -237,3 +264,9 @@ Message<WildMessage> Client::CreateMessageJoinRequest() {
 	message.header.id = WildMessage::JOIN_REQUEST;
 	return message;
 };
+Message<WildMessage> Client::CreateMessagePlayerShot() {
+
+	Message<WildMessage> message;
+	message.header.id = WildMessage::SHOT;
+	return message;
+}

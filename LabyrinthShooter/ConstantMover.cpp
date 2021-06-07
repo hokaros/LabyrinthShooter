@@ -16,9 +16,19 @@ void ConstantMover::Update() {
 }
 
 void ConstantMover::SetDirection(const Vector& newDir) {
+	std::lock_guard<std::mutex> lock(mutex);
+
 	moveDir = newDir;
 
 	moveDir.Normalize();
+
+	if (onDirectionChanged)
+		onDirectionChanged(moveDir);
+}
+
+const Vector& ConstantMover::GetDirection() {
+	std::lock_guard<std::mutex> lock(mutex);
+	return moveDir;
 }
 
 bool ConstantMover::IsSameDirection(const Vector& otherDir) const {

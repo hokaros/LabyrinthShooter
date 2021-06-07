@@ -4,6 +4,7 @@
 #include <map>
 #include <ctime>
 #include <vector>
+#include "../LabyrinthShooter/Shared.h"
 
 #include "ConnectionHandler.h"
 #include "Message.h"

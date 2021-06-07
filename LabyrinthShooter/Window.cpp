@@ -73,8 +73,6 @@ void Window::Render() {
 		mid.x = tra.rect.w / 2;
 		mid.y = tra.rect.h / 2;
 		SDL_RenderCopyEx(renderer, tra.texture, NULL, &(tra.rect), tra.angle, &mid, SDL_FLIP_NONE);
-
-		SDL_DestroyTexture(tra.texture);
 	}
 	renderTextures.clear();
 

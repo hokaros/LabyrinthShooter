@@ -127,7 +127,7 @@ private:
 		createdSize = 0;
 		onGoingMessage = false;
 
-		std::cout << "Message successfully received" << std::endl;
+		std::cout << "Message successfully received from "<< id << std::endl;
 		// Callback
 		if (onMessageReceived)
 			onMessageReceived(id, message);

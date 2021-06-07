@@ -20,12 +20,15 @@ Game::Game(Window& window, GameStartInfo&& gameInfo)
 }
 
 Game::~Game() {
+	std::lock_guard<std::mutex> lock(playersMutex);
 	if (players != NULL) {
 		delete[] players; // usuniêcie tablicy wskaŸników
 	}
 }
 
 void Game::LoadStartingObjects() {
+	std::lock_guard<std::mutex> lock(playersMutex);
+
 	// Za³adowanie graczy
 	playerCount = startInfo.GetPlayerCount();
 	players = new GameObject * [playerCount];
@@ -66,6 +69,7 @@ bool Game::Run() {
 		go->Start();
 	}
 
+	SetRunning(true);
 	// Pêtla gry
 	while (!quit) {
 		// Nowa klatka
@@ -81,6 +85,9 @@ bool Game::Run() {
 
 		//generowanie t³a
 		SDL_FillRect(screen, NULL, black);
+
+		// Wywo³anie zleconych akcji
+		InvokePostponed();
 
 		for (GameObject* go : objectManager.GetAllObjects()) {
 			go->Update();
@@ -116,6 +123,7 @@ bool Game::Run() {
 		objectManager.DisposeDestroyed();
 	}
 
+	SetRunning(false);
 	return true;
 }
 
@@ -129,7 +137,8 @@ GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
 	// Obiekt gracza
 	GameObject* player = new GameObject(Vector(20, 20), position, objectManager.GetAllObjects());
 	player->SetRenderer(new SpriteRenderer(*player, screen, bitmaps.playerBmp));
-	player->AddComponent(new ConstantMover(*player, PLAYER_SPEED));
+	ConstantMover* mover = new ConstantMover(*player, PLAYER_SPEED);
+	player->AddComponent(mover);
 	objectManager.AddObject(player);
 
 	// Broñ
@@ -171,10 +180,67 @@ GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
 	);
 
 	if (isControlled) {
-		player->AddComponent(new PlayerController(*player));
+		PlayerController* controller = new PlayerController(*player);
+		player->AddComponent(controller);
+		controller->onAimChanged = [this](double newRot) {
+			if (onControlledAimChanged) 
+				onControlledAimChanged(newRot); 
+		};
+		controller->onShot = [this]() {
+			if (onControlledShot)
+				onControlledShot();
+		};
+		controller->onWeaponChanged = [this](FirearmType newType) {
+			if (onControlledWeaponChanged)
+				onControlledWeaponChanged(newType);
+		};
+		mover->onDirectionChanged = [this](const Vector& newDir) {OnControlledDirectionChanged(newDir); };
 	}
 
 	return player;
+}
+
+GameObject* Game::GetControlledPlayer() {
+	std::lock_guard<std::mutex> lock(playersMutex);
+	return controlledPlayer;
+}
+
+GameObject* Game::GetPlayer(int id) {
+	std::lock_guard<std::mutex> lock(playersMutex);
+
+	if (players == NULL || playerCount <= id)
+		return NULL;
+
+	return players[id];
+}
+
+void Game::Invoke(function<void()> fun) {
+	std::lock_guard<std::mutex> lock(invokesMutex);
+	invokes.push_back(std::move(fun));
+}
+
+void Game::InvokePostponed() {
+	std::lock_guard<std::mutex> lock(invokesMutex);
+	for (function<void()> fun : invokes) {
+		if (fun)
+			fun();
+	}
+	invokes.clear();
+}
+
+void Game::OnControlledDirectionChanged(const Vector& newDir) {
+	if (onControlledDirectionChanged)
+		onControlledDirectionChanged(newDir);
+}
+
+bool Game::IsRunning() {
+	std::lock_guard<std::mutex> lock(metadataMutex);
+	return isRunning;
+}
+
+void Game::SetRunning(bool running) {
+	std::lock_guard<std::mutex> lock(metadataMutex);
+	isRunning = running;
 }
 
 

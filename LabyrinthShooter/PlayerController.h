@@ -13,7 +13,10 @@ class PlayerController :
 {
 public:
 	// Zdarzenie zmiany kierunku ruchu (nowy kierunek podawany jako argument)
-	std::function<void(Vector)> onMovementChanged;
+	function<void(Vector)> onMovementChanged;
+	function<void(double)> onAimChanged;
+	function<void()> onShot;
+	function<void(FirearmType)> onWeaponChanged;
 
 public:
 	PlayerController(GameObject& player);

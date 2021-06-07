@@ -174,7 +174,13 @@ void GameObject::Rotate(double angle) {
 		child->Translate(dPos);
 	}
 
+
 	rotation += angle;
+}
+
+void GameObject::SetRotation(double newRot) {
+	double dRot = newRot - rotation;
+	Rotate(dRot);
 }
 
 void GameObject::LookAt(const Vector& point) {

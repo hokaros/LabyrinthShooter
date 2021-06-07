@@ -20,11 +20,17 @@ void PlayerController::Update() {
 	// Zmiana broni
 	if (input->PressedThisFrame(WPN_SWITCH_KEY)) {
 		equipment->SwitchWeapon();
+
+		if (onWeaponChanged)
+			onWeaponChanged(equipment->GetCurrentWeapon()->GetType());
 	}
 
 	// Strzelanie
 	if (input->IsKeyDown(SHOOT_KEY) && equipment->GetCurrentWeapon() != NULL) {
-		equipment->GetCurrentWeapon()->TryShoot();
+		bool success = equipment->GetCurrentWeapon()->TryShoot();
+
+		if (success && onShot)
+			onShot();
 	}
 }
 
@@ -58,7 +64,11 @@ void PlayerController::ProcessMovement() {
 }
 
 void PlayerController::ProcessAim() {
-	Vector mousePos = input->GetMousePosition();
+	double prevRotation = gameObject.GetRotation();
 
+	Vector mousePos = input->GetMousePosition();
 	gameObject.LookAt(mousePos);
+
+	if (gameObject.GetRotation() != prevRotation && onAimChanged)
+		onAimChanged(gameObject.GetRotation());
 }

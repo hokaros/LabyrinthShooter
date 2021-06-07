@@ -2,8 +2,6 @@
 #include "ObjectComponent.h"
 #include "Firearm.h"
 
-enum class WeaponType { Basic, Super };
-
 // Komponent odpowiedzialny za zmienianie broni
 class PlayerEquipment :
 	public ObjectComponent
@@ -13,7 +11,7 @@ public:
 
 	void Start() override;
 
-	void EquipWeapon(WeaponType weaponType);
+	void EquipWeapon(FirearmType weaponType);
 	void SwitchWeapon();
 
 	Firearm* GetCurrentWeapon();

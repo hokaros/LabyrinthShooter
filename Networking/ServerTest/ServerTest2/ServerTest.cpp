@@ -1,8 +1,8 @@
 ﻿#include <iostream>
-#include "Server.h"
 #include <thread>
 #include <iostream>
 #include <map>
+#include <Server.h>
 
 Server* server;
 std::thread* serverThread;

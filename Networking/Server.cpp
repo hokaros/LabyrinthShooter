@@ -75,8 +75,6 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 			std::cout << from_msg << "\n";
 		}
 		break;
-	case WildMessage::PLAYER_DEATH:
-		break;
 	case WildMessage::WALL_DESTRUCTION:
 		break;
 	case WildMessage::LABIRYNTH_CHANGE:
@@ -85,13 +83,15 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 		break;
 	case WildMessage::POSITION:
 		break;
+	case WildMessage::PLAYER_DEATH:
 	case WildMessage::NEW_DIRECTION:
-		break;
-	case WildMessage::WEAPON_CHANGE:
-		break;
 	case WildMessage::CHANGE_OF_AIMING_DIRECTION:
-		break;
+	case WildMessage::WEAPON_CHANGE:
 	case WildMessage::SHOT:
+		// Doklejenie id
+		msg << clientIdIndexMap[clientId];
+		// Rozes³anie
+		MessageAllClients(msg);
 		break;
 	case WildMessage::JOIN_REQUEST:
 	{

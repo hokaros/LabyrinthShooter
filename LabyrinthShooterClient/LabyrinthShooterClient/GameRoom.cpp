@@ -2,10 +2,7 @@
 
 GameRoom::GameRoom(Window& window, Client* client)
 	: window(window), playerCount(1), client(client) {
-
-	client->onPlayerJoined = [this]() {OnPlayerJoined(); };
-	client->onPlayerLeft = [this]() {OnPlayerLeft(); };
-	client->onGameStarted = [this](int selfId, float positions[PLAYERS_NUM][2], bool* walls) {OnGameStarted(selfId, positions, walls); };
+	SubscribeToClient();
 }
 
 void GameRoom::Enter() {
@@ -92,6 +89,7 @@ void GameRoom::RunGame() {
 		nextGame = NULL;
 	}
 
+	SubscribeToGame();
 	game->Run();
 
 	delete game;
@@ -140,6 +138,84 @@ void GameRoom::OnGameStarted(int selfId, float positions[PLAYERS_NUM][2], bool* 
 		playerPositions[i] = Vector(positions[i][0], positions[i][1]);
 	}
 	StartGame(selfId, playerPositions, PLAYERS_NUM);
+}
+
+void GameRoom::SubscribeToClient() {
+	client->onPlayerJoined = [this]() {OnPlayerJoined(); };
+	client->onPlayerLeft = [this]() {OnPlayerLeft(); };
+	client->onGameStarted = [this](int selfId, float positions[PLAYERS_NUM][2], bool* walls) {OnGameStarted(selfId, positions, walls); };
+
+	client->onDirectionChanged = [this](int id, Vector newDir) {
+		printf("Direction changed of player %d\n", id);
+		if (game == NULL || !game->IsRunning())
+			return;
+
+		GameObject* player = game->GetPlayer(id);
+		if (player == NULL || player == game->GetControlledPlayer())
+			return;
+
+		game->Invoke([player, newDir]() { player->FindComponent<ConstantMover>()->SetDirection(newDir); });
+	};/*
+	client->onAimChanged = [this](int id, double rotation) {
+		printf("Aiming changed of player %d\n", id);
+		if (game == NULL || !game->IsRunning())
+			return;
+
+		GameObject* player = game->GetPlayer(id);
+		if (player == NULL || player == game->GetControlledPlayer())
+			return;
+
+		game->Invoke([player, rotation]() { player->SetRotation(rotation); });
+	};*/
+	client->onShot = [this](int id) {
+		printf("Player %d shot\n", id);
+		if (game == NULL || !game->IsRunning())
+			return;
+
+		GameObject* player = game->GetPlayer(id);
+		if (player == NULL || player == game->GetControlledPlayer())
+			return;
+
+		game->Invoke([player]() { player->FindComponent<PlayerEquipment>()->GetCurrentWeapon()->TryShoot(); });
+	};
+	client->onWeaponChanged = [this](int id, FirearmType newType) {
+		printf("Player %d changed weapon\n", id);
+		if (game == NULL || !game->IsRunning())
+			return;
+
+		GameObject* player = game->GetPlayer(id);
+		if (player == NULL || player == game->GetControlledPlayer())
+			return;
+
+		game->Invoke([player, newType]() { player->FindComponent<PlayerEquipment>()->EquipWeapon(newType); });
+	};
+}
+
+void GameRoom::SubscribeToGame() {
+	game->onControlledDirectionChanged = [this](const Vector& newDir) {
+		if (client == NULL)
+			return;
+
+		client->Send(Client::CreateMessageNewDirection(newDir));
+	};/*
+	game->onControlledAimChanged = [this](double newRot) {
+		if (client == NULL)
+			return;
+
+		client->Send(Client::CreateMessageChangeOfAimingDirection(newRot));
+	};*/
+	game->onControlledShot = [this]() {
+		if (client == NULL)
+			return;
+
+		client->Send(Client::CreateMessagePlayerShot());
+	};
+	game->onControlledWeaponChanged = [this](FirearmType newType) {
+		if (client == NULL)
+			return;
+
+		client->Send(Client::CreateMessageWeaponChange(newType));
+	};
 }
 
 

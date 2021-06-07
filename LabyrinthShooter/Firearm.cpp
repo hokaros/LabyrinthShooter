@@ -13,9 +13,9 @@ void Firearm::Update() {
 	}
 }
 
-void Firearm::TryShoot() {
+bool Firearm::TryShoot() {
 	if (!isReloaded)
-		return;
+		return false;
 
 	// Stworzenie pocisku
 	GameObject* bullet = new GameObject(bulletPrefab);
@@ -34,6 +34,8 @@ void Firearm::TryShoot() {
 	// Aktualizacja info o prze³adowaniu
 	timeSinceLastShot = 0.0f;
 	isReloaded = false;
+
+	return true;
 }
 
 ObjectComponent* Firearm::Copy(GameObject& newOwner) {

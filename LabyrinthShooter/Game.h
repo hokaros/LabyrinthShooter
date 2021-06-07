@@ -76,14 +76,27 @@ private:
 class Game
 {
 public:
+	function<void(const Vector&)> onControlledDirectionChanged;
+	function<void(double)> onControlledAimChanged;
+	function<void()> onControlledShot;
+	function<void(FirearmType)> onControlledWeaponChanged;
+
+public:
 	Game(Window& window, GameStartInfo&& gameInfo);
 	~Game();
 
 	// G³ówna pêtla gry. Zwraca fa³sz, jeœli w trakcie u¿ytkownik zamknie okno
 	bool Run();
+	bool IsRunning();
 
 	// Usuwa wszystkie obiekty
 	void Clear();
+
+	// Wywo³uje funkcjê w najbli¿szej klatce
+	void Invoke(function<void()> fun);
+
+	GameObject* GetControlledPlayer();
+	GameObject* GetPlayer(int id);
 
 private:
 	Window& window;
@@ -94,6 +107,7 @@ private:
 	GameObject* controlledPlayer = NULL;
 
 	GameStartInfo startInfo;
+	bool isRunning = false;
 
 	GameBitmaps bitmaps;
 
@@ -102,8 +116,21 @@ private:
 	GameObject basicBullet; // TODO: przenieœæ prefaby do osobnej struktury
 	GameObject superBullet;
 
+	// Lista funkcji do wykonania w najbli¿szej klatce
+	std::list<function<void()>> invokes;
+
+	std::mutex invokesMutex;
+	std::mutex playersMutex;
+	std::mutex metadataMutex;
+
 private:
 	void LoadStartingObjects();
+	void SetRunning(bool running);
 
 	GameObject* CreatePlayer(const Vector& position, bool isControlled = false);
+
+	void InvokePostponed();
+
+	void OnControlledDirectionChanged(const Vector& newDir);
+
 };

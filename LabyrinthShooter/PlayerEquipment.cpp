@@ -19,8 +19,8 @@ ObjectComponent* PlayerEquipment::Copy(GameObject& newOwner) {
 	return new PlayerEquipment(newOwner);
 }
 
-void PlayerEquipment::EquipWeapon(WeaponType weaponType) {
-	if (weaponType == WeaponType::Basic) {
+void PlayerEquipment::EquipWeapon(FirearmType weaponType) {
+	if (weaponType == FirearmType::Basic) {
 		EquipWeapon(basicWpn);
 	}
 	else {
