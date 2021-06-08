@@ -12,6 +12,7 @@ public:
 	Health(GameObject& owner, int maxHealth, StatRenderer* healthRenderer);
 
 	void Hurt(int hp);
+	bool IsDead() const;
 
 	// Obs³ugiwanie œmierci z argumentem tego komponentu
 	void SubscribeDeath(function<void(Health*)> handler);

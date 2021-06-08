@@ -25,8 +25,10 @@ public:
 
 	void PrintLab();
 	void ChangeLab();
+	void SetWalls(bool* walls);
 	bool* getWalls();
 	int ActiveCount() const;
+	static int MemorySize(int x, int y);
 	int VerticalCount() const;
 	int HorizontalCount() const;
 

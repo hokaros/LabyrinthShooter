@@ -53,7 +53,7 @@ private:
 
 	void OnPlayerJoined();
 	void OnPlayerLeft();
-	void OnGameStarted(int selfId, float positions[PLAYERS_NUM][2], bool* walls);
+	void OnGameStarted(int selfId, float positions[PLAYERS_NUM][2]);
 };
 
 

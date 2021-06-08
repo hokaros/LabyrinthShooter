@@ -30,6 +30,10 @@ void Health::Hurt(int hp) {
 	}
 }
 
+bool Health::IsDead() const {
+	return currHealth <= 0;
+}
+
 void Health::OnDeath() {
 	for (function<void(Health*)> handler : onDeath) {
 		if (handler) {

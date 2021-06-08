@@ -1,7 +1,7 @@
 #include "Game.h"
 
-Game::Game(Window& window, GameStartInfo&& gameInfo)
-	: window(window),
+Game::Game(Window& window, GameStartInfo&& gameInfo, bool serverVersion)
+	: window(window), isServer(serverVersion),
 	basicBullet(Vector(4, 4), objectManager.GetAllObjects()), // uwa¿aæ przy zmienianiu objectManagera
 	superBullet(Vector(10, 10), objectManager.GetAllObjects()),
 	startInfo(std::move(gameInfo)),
@@ -34,7 +34,7 @@ void Game::LoadStartingObjects() {
 	players = new GameObject * [playerCount];
 
 	for (size_t i = 0; i < playerCount; i++) {
-		bool isControllable = startInfo.GetControllableIndex() == i;
+		bool isControllable = startInfo.GetControllableIndex() == i && !isServer;
 		GameObject* newPlayer = CreatePlayer(startInfo.GetPlayerPosition(i), isControllable);
 
 		players[i] = newPlayer;
@@ -51,13 +51,14 @@ bool Game::Run() {
 	int black = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
 
 	Vector mapStart(10, 10);
-	LabyrinthSolidifier lab(mapStart, WALL_THICKNESS, WALL_LENGTH, LAB_X, LAB_Y, objectManager.GetAllObjects(), LAB_TIME);
+	LabyrinthSolidifier lab(mapStart, WALL_THICKNESS, WALL_LENGTH, LAB_X, LAB_Y, objectManager.GetAllObjects(), LAB_TIME, isServer);
 	for (int i = 0; i < lab.WallsCount(); i++) {
 		objectManager.AddUndestroyable(lab.GetWalls()[i]);
 	}
 	for (int i = 0; i < lab.BorderElements(); i++) {
 		objectManager.AddUndestroyable(lab.GetBorder()[i]);
 	}
+	lab.onChanged = [this](bool* newWalls) {onLabChanged(newWalls); };
 
 	LoadStartingObjects();
 
@@ -75,11 +76,11 @@ bool Game::Run() {
 		// Nowa klatka
 		timer.NextFrame();
 
-		if (!input->Update()) {
+		if (input != NULL && !input->Update()) {
 			return false;
 		}
 
-		if (input->PressedThisFrame(SDLK_ESCAPE)) {
+		if (input != NULL && input->PressedThisFrame(SDLK_ESCAPE)) {
 			quit = 1;
 		}
 
@@ -94,28 +95,8 @@ bool Game::Run() {
 		}
 
 		// Renderowanie obiektów
-		for (GameObject* go : objectManager.GetAllObjects()) {
-			if (go->renderUnseen) {
-				go->RenderUpdate();
-				continue;
-			}
-
-			// Wyœwietlanie tylko, jeœli obiekt jest widziany przez obecnego gracza
-			if ((go->GetPosition() - controlledPlayer->GetPosition()).LengthSquared() > PLAYER_SIGHT * PLAYER_SIGHT)
-				continue;  // zbyt daleko
-
-			// Sprawdzenie, czy œciana stoi na drodze
-			bool canSee = !lab.GetColliderMemory().Raycast(
-				controlledPlayer->GetMiddle(),
-				go->GetMiddle(),
-				go
-			);
-			if (canSee) {
-				go->RenderUpdate();
-			}
-		}
-		// Renderowanie nak³adek UI
-		healthStats.Render();
+		Render(lab);
+		
 
 		lab.Update();
 		window.Render();
@@ -241,6 +222,31 @@ bool Game::IsRunning() {
 void Game::SetRunning(bool running) {
 	std::lock_guard<std::mutex> lock(metadataMutex);
 	isRunning = running;
+}
+
+void Game::Render(LabyrinthSolidifier& lab) {
+	for (GameObject* go : objectManager.GetAllObjects()) {
+		if (go->renderUnseen || controlledPlayer == NULL || controlledPlayer->FindComponent<Health>()->IsDead()) {
+			go->RenderUpdate();
+			continue;
+		}
+
+		// Wyœwietlanie tylko, jeœli obiekt jest widziany przez obecnego gracza
+		if ((go->GetPosition() - controlledPlayer->GetPosition()).LengthSquared() > PLAYER_SIGHT * PLAYER_SIGHT)
+			continue;  // zbyt daleko
+
+		// Sprawdzenie, czy œciana stoi na drodze
+		bool canSee = !lab.GetColliderMemory().Raycast(
+			controlledPlayer->GetMiddle(),
+			go->GetMiddle(),
+			go
+		);
+		if (canSee) {
+			go->RenderUpdate();
+		}
+	}
+	// Renderowanie nak³adek UI
+	healthStats.Render();
 }
 
 

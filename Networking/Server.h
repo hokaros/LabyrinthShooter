@@ -5,9 +5,11 @@
 #include <ctime>
 #include <vector>
 #include "../LabyrinthShooter/Shared.h"
+#include "../LabyrinthShooter/Labirynt.h"
 
 #include "ConnectionHandler.h"
 #include "Message.h"
+#include "GameInfoReceiver.h"
 
 #define PORT_DEFAULT 80
 #define PLAYERS_NUM 2
@@ -15,8 +17,10 @@
 #define HEIGHT 600
 #define WIDTH 800
 
+using std::function;
 
-class Server
+
+class Server : public GameInfoReceiver
 {
 public:
 	// Zdarzenia
@@ -24,13 +28,19 @@ public:
 	void (*onClientDisconnected)(int id);
 	void (*onMessageReceived) (int clientId, const std::string& msg);
 
+public:
 	Server();
 	void Listen();
 
-	Message<WildMessage> CreateMessageGameInit(int id);
+	void MessageAllClients(const Message<WildMessage>& message);
 
 	void Stop();
 	~Server();
+
+	Message<WildMessage> CreateMessageGameInit(int id);
+
+	static Message<WildMessage> CreateMessagePlayerDeath(int id);
+	static Message<WildMessage> CreateMessageLabirynthChange(bool* newWalls);
 protected:
 	void OnMessageReceived(int clientId, const Message<WildMessage>& message);
 private:
@@ -38,7 +48,6 @@ private:
 	bool playersReady();
 	void initGame();
 	void GenerateAndSendPositions();
-	void MessageAllClients(const Message<WildMessage>& message);
 
 	int lastClientId = 0;
 

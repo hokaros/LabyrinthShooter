@@ -38,13 +38,13 @@ void GameRoom::Enter() {
 			startGame = false;
 		}
 
-		if (input->PressedThisFrame(SDLK_RETURN)) {
-			// Testowe wejœcie do gry
-			SetNextGame(new Game(window, 
-				GameStartInfo(new Vector[1]{ Vector(50, 200) }, 1, 0))
-			);
-			RunGame();
-		}
+		//if (input->PressedThisFrame(SDLK_RETURN)) {
+		//	// Testowe wejœcie do gry
+		//	SetNextGame(new Game(window, 
+		//		GameStartInfo(new Vector[1]{ Vector(50, 200) }, 1, 0))
+		//	);
+		//	RunGame();
+		//}
 		if (input->PressedThisFrame(SDLK_ESCAPE)) {
 			quit = true;
 		}
@@ -132,7 +132,7 @@ void GameRoom::OnPlayerLeft() {
 	SetPlayerCount(GetPlayerCount() - 1);
 }
 
-void GameRoom::OnGameStarted(int selfId, float positions[PLAYERS_NUM][2], bool* walls) {
+void GameRoom::OnGameStarted(int selfId, float positions[PLAYERS_NUM][2]) {
 	Vector playerPositions[PLAYERS_NUM];
 	for (int i = 0; i < PLAYERS_NUM; i++) {
 		playerPositions[i] = Vector(positions[i][0], positions[i][1]);
@@ -143,7 +143,7 @@ void GameRoom::OnGameStarted(int selfId, float positions[PLAYERS_NUM][2], bool* 
 void GameRoom::SubscribeToClient() {
 	client->onPlayerJoined = [this]() {OnPlayerJoined(); };
 	client->onPlayerLeft = [this]() {OnPlayerLeft(); };
-	client->onGameStarted = [this](int selfId, float positions[PLAYERS_NUM][2], bool* walls) {OnGameStarted(selfId, positions, walls); };
+	client->onGameStarted = [this](int selfId, float positions[PLAYERS_NUM][2]) {OnGameStarted(selfId, positions); };
 
 	client->onDirectionChanged = [this](int id, Vector newDir, Vector pos) {
 		printf("Direction changed of player %d\n", id);

@@ -112,42 +112,18 @@ void Client::OnMessageReceived(const Message<WildMessage>& message) {
 		if (onPlayerDead)
 			onPlayerDead(id);
 		break;
-	case WildMessage::NEW_DIRECTION: {
-		// Odebranie kierunku, w którym zacz¹³ siê poruszaæ gracz i jego id
-		Vector dir, pos;
-		msg >> id >> dir >> pos;
-
-		if (onDirectionChanged)
-			onDirectionChanged(id, dir, pos);
+	case WildMessage::NEW_DIRECTION:
+		ReceiveMessageNewDirection(msg);
 		break;
-	}
-	case WildMessage::WEAPON_CHANGE: {
-		FirearmType newType;
-
-		msg >> id >> newType;
-
-		if (onWeaponChanged)
-			onWeaponChanged(id, newType);
+	case WildMessage::WEAPON_CHANGE:
+		ReceiveMessageWeaponChange(msg);
 		break;
-	}
-	case WildMessage::CHANGE_OF_AIMING_DIRECTION: {
-		double rotation;
-		msg >> id >> rotation;
-
-		if (onAimChanged)
-			onAimChanged(id, rotation);
+	case WildMessage::CHANGE_OF_AIMING_DIRECTION:
+		ReceiveMessageAimChange(msg);
 		break;
-	}
-	case WildMessage::SHOT: {
-		double rot;
-		FirearmType wpnType;
-		Vector srcPos;
-		msg >> id >> rot >> wpnType >> srcPos;
-
-		if (onShot)
-			onShot(id, rot, wpnType, srcPos);
+	case WildMessage::SHOT:
+		ReceiveMessageShot(msg);
 		break;
-	}
 	case WildMessage::JOIN_REQUEST:
 		break;
 	case WildMessage::JOIN_ACCEPT:
@@ -171,66 +147,18 @@ void Client::OnMessageReceived(const Message<WildMessage>& message) {
 			onPlayerLeft();
 		break;
 	case WildMessage::GAME_STARTED:
-	{
-		std::cout << "Game Started\n";
-		int id;
-		float positions[PLAYERS_NUM][2];
-
-		//	TODO
-		int num = 4;
-
-		msg >> id;
-		std::cout << "Id: " << id << "\n";
-		for (int i = 0; i < PLAYERS_NUM; i++)
-		{
-			msg >> positions[i][0];
-			msg >> positions[i][1];
-			std::cout << "Position " << i << ": " << positions[i][0] << ' ' << positions[i][1] << "\n";
-		}
-
-		std::cout << "Walls : " ;
-		bool* walls = new bool[num];
-		for (int i = 0; i < num; i++)
-		{
-			bool wall;
-			msg >> wall;
-			std::cout << wall << ' ';
-
-			walls[i] = wall;
-		}
-		std::cout << "\n";
-		//
-
-		if (onGameStarted)
-			onGameStarted(id, positions, walls);
+		ReceiveMessageGameStarted(msg);
 		break;
-	}
 	default: break;
 	}
 }
 //Zmiany
-Message<WildMessage> Client::CreateMessagePlayerDeath(int id) {
-
-	Message<WildMessage> message;
-	message.header.id = WildMessage::PLAYER_DEATH;
-	message << id;
-	return message;
-};
 Message<WildMessage> Client::CreateMessageWallDestruction(int x, int y) {
 
 	Message<WildMessage> message;
 	message.header.id = WildMessage::WALL_DESTRUCTION;
 	message << x;
 	message << y;
-	return message;
-};
-Message<WildMessage> Client::CreateMessageLabirynthChange(bool* change, int size) {
-
-	Message<WildMessage> message;
-	message.header.id = WildMessage::LABIRYNTH_CHANGE;
-	for (int i = 0; i < size; i++) {
-		message << change[i];
-	}
 	return message;
 };
 /*Message<WildMessage> Client::CreateMessagePosition(Vector pos, int id) {

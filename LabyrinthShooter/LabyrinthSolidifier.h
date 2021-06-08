@@ -12,11 +12,16 @@
 class LabyrinthSolidifier : public IUpdateable
 {
 public:
+	// Po wymieszaniu labiryntu
+	function<void(bool*)> onChanged;
+
+public:
 	LabyrinthSolidifier(const Vector& pos,
 		int wallWidth, int wallLength,
 		int xCount, int yCount,
 		const std::list<GameObject*>& allObjects,
-		double changeTime
+		double changeTime,
+		bool shouldChange = false
 	);
 	~LabyrinthSolidifier();
 
@@ -27,6 +32,7 @@ public:
 	GameObject** GetBorder() const;
 	Vector GetSize() const;
 
+	void SetLab(bool* walls);
 	void ChangeLab();
 	const ColliderMemory& GetColliderMemory() const;
 
@@ -53,6 +59,7 @@ private:
 	int wallColor;
 	int gateColor;
 
+	bool shouldChange;
 	double changeTime;
 	double timeSinceLastChange;
 private:

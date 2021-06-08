@@ -83,11 +83,44 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 		break;
 	case WildMessage::POSITION:
 		break;
+
+	case WildMessage::NEW_DIRECTION: {
+		// Doklejenie id
+		msg << clientIdIndexMap[clientId];
+		// Rozes³anie
+		MessageAllClients(msg);
+		// Przetworzenie
+		ReceiveMessageNewDirection(msg);
+		break;
+	}
+	case WildMessage::WEAPON_CHANGE: {
+		// Doklejenie id
+		msg << clientIdIndexMap[clientId];
+		// Rozes³anie
+		MessageAllClients(msg);
+		// Przetworzenie
+		ReceiveMessageWeaponChange(msg);
+		break;
+	}
+	case WildMessage::CHANGE_OF_AIMING_DIRECTION: {
+		// Doklejenie id
+		msg << clientIdIndexMap[clientId];
+		// Rozes³anie
+		MessageAllClients(msg);
+		// Przetworzenie
+		ReceiveMessageAimChange(msg);
+		break;
+	}
+	case WildMessage::SHOT: {
+		// Doklejenie id
+		msg << clientIdIndexMap[clientId];
+		// Rozes³anie
+		MessageAllClients(msg);
+		// Przetworzenie
+		ReceiveMessageShot(msg);
+		break;
+	}
 	case WildMessage::PLAYER_DEATH:
-	case WildMessage::NEW_DIRECTION:
-	case WildMessage::CHANGE_OF_AIMING_DIRECTION:
-	case WildMessage::WEAPON_CHANGE:
-	case WildMessage::SHOT:
 		// Doklejenie id
 		msg << clientIdIndexMap[clientId];
 		// Rozes³anie
@@ -154,6 +187,9 @@ void Server::initGame()
 	{
 		Message<WildMessage> message = CreateMessageGameInit(i);
 		players[i]->WriteMessage(message);
+
+		if (i == 0)
+			ReceiveMessageGameStarted(message); // przetworzenie przez serwer
 	}
 }
 
@@ -211,16 +247,7 @@ Message<WildMessage> Server::CreateMessageGameInit(int id) {
 	message.header.id = WildMessage::GAME_STARTED;
 	//	TODO
 
-	//example
-	int num = 4;
-	bool walls[] = { 1,1,0,0 };
-	//float start_A_x = 10.5, start_A_y = 20;
-	//float start_B_x = 19.5, start_B_y = 20;
 
-	for (int i = num - 1; i >= 0; i--) message << walls[i];
-
-	//message << start_B_y << start_B_x;
-	//message << start_A_y << start_A_x;
 	for (int i = PLAYERS_NUM - 1; i >= 0; i--) {
 		message << posY[i];
 		message << posX[i];
@@ -230,3 +257,22 @@ Message<WildMessage> Server::CreateMessageGameInit(int id) {
 	//
 	return message;
 };
+
+Message<WildMessage> Server::CreateMessagePlayerDeath(int id) {
+
+	Message<WildMessage> message;
+	message.header.id = WildMessage::PLAYER_DEATH;
+	message << id;
+	return message;
+};
+
+Message<WildMessage> Server::CreateMessageLabirynthChange(bool* newWalls) {
+	Message<WildMessage> message;
+	message.header.id = WildMessage::LABIRYNTH_CHANGE;
+
+	int wallsNum = Labirynt::MemorySize(LAB_X, LAB_Y);
+	bool* walls = new bool[wallsNum];
+	for (int i = wallsNum - 1; i >= 0; i--) message << walls[i];
+
+	return message;
+}

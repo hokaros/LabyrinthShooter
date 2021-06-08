@@ -20,10 +20,6 @@
 
 // Czas, co jaki zmienia siê labirynt
 #define LAB_TIME 2
-#define LAB_X 7
-#define LAB_Y 5
-#define WALL_THICKNESS 10
-#define WALL_LENGTH 100
 
 #define BULLET_BASIC_SPEED 1000
 #define BULLET_BASIC_DAMAGE 1
@@ -80,9 +76,10 @@ public:
 	function<void(double)> onControlledAimChanged;
 	function<void()> onControlledShot;
 	function<void(FirearmType)> onControlledWeaponChanged;
+	function<void(bool*)> onLabChanged;
 
 public:
-	Game(Window& window, GameStartInfo&& gameInfo);
+	Game(Window& window, GameStartInfo&& gameInfo, bool serverVersion = false);
 	~Game();
 
 	// G³ówna pêtla gry. Zwraca fa³sz, jeœli w trakcie u¿ytkownik zamknie okno
@@ -99,6 +96,8 @@ public:
 	GameObject* GetPlayer(int id);
 
 private:
+	bool isServer;
+
 	Window& window;
 	Timer timer;
 	ObjectManager objectManager;
@@ -132,5 +131,7 @@ private:
 	void InvokePostponed();
 
 	void OnControlledDirectionChanged(const Vector& newDir);
+
+	void Render(LabyrinthSolidifier& lab);
 
 };

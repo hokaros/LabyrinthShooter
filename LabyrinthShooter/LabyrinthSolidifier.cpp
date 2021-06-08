@@ -4,11 +4,13 @@ LabyrinthSolidifier::LabyrinthSolidifier(const Vector& pos,
 	int wallWidth, int wallLength,
 	int xCount, int yCount,
 	const std::list<GameObject*>& allObjects,
-	double changeTime)
+	double changeTime,
+	bool shouldChange)
 	: position(pos), wallWidth(wallWidth), wallLength(wallLength),
 	xCount(xCount), yCount(yCount),
 	labyrinth(xCount, yCount), allObjects(allObjects),
 	changeTime(changeTime),
+	shouldChange(shouldChange),
 	colliderMemory(LabyrinthSize(wallWidth, wallLength, xCount, yCount).x + pos.x, LabyrinthSize(wallWidth, wallLength, xCount, yCount).y + pos.y)
 	{
 
@@ -114,11 +116,21 @@ void LabyrinthSolidifier::PlaceWalls() {
 	}
 }
 
+void LabyrinthSolidifier::SetLab(bool* walls) {
+	labyrinth.SetWalls(walls);
+	PlaceWalls();
+
+	colliderMemory.Refresh(this->walls, labyrinth.ActiveCount());
+}
+
 void LabyrinthSolidifier::ChangeLab() {
 	labyrinth.ChangeLab();
 	PlaceWalls();
 
 	colliderMemory.Refresh(walls, labyrinth.ActiveCount());
+
+	if (onChanged)
+		onChanged(labyrinth.getWalls());
 }
 
 const ColliderMemory& LabyrinthSolidifier::GetColliderMemory() const {
@@ -212,6 +224,9 @@ GameObject** LabyrinthSolidifier::BuildGateWall(Direction side) {
 }
 
 void LabyrinthSolidifier::Update() {
+	if (!shouldChange)
+		return;
+
 	timeSinceLastChange += Timer::Main()->GetDeltaTime();
 	if (timeSinceLastChange >= changeTime) {
 		ChangeLab();

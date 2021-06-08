@@ -249,6 +249,13 @@ void Labirynt::PrintLab()
 	// ╣ ║ ╗ ╝ ╚ ╩ ╔ ╦ ╠ ═ ╬ █
 }
 
+void Labirynt::SetWalls(bool* walls) {
+	if (this->walls != NULL)
+		delete[] this->walls;
+
+	this->walls = walls;
+}
+
 void Labirynt::ChangeLab()
 {
 	ShuffleWalls();
@@ -290,6 +297,10 @@ int Labirynt::ActiveCount() const {
 	}
 	int theory = walls_num - x * y + 1;
 	return counter; // TODO: czas stały
+}
+
+int Labirynt::MemorySize(int x, int y) {
+	return 2 * x * y - x - y;
 }
 
 int Labirynt::VerticalCount() const {
