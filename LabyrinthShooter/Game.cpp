@@ -60,14 +60,14 @@ bool Game::Run() {
 	}
 
 	Vector mapStart(10, 10);
-	LabyrinthSolidifier lab(mapStart, WALL_THICKNESS, WALL_LENGTH, LAB_X, LAB_Y, objectManager.GetAllObjects(), LAB_TIME, isServer);
-	for (int i = 0; i < lab.WallsCount(); i++) {
-		objectManager.AddUndestroyable(lab.GetWalls()[i]);
+	lab = new LabyrinthSolidifier(mapStart, WALL_THICKNESS, WALL_LENGTH, LAB_X, LAB_Y, objectManager.GetAllObjects(), LAB_TIME, isServer);
+	for (int i = 0; i < lab->WallsCount(); i++) {
+		objectManager.AddUndestroyable(lab->GetWalls()[i]);
 	}
-	for (int i = 0; i < lab.BorderElements(); i++) {
-		objectManager.AddUndestroyable(lab.GetBorder()[i]);
+	for (int i = 0; i < lab->BorderElements(); i++) {
+		objectManager.AddUndestroyable(lab->GetBorder()[i]);
 	}
-	lab.onChanged = [this](bool* newWalls) {onLabChanged(newWalls); };
+	lab->onChanged = [this](bool* newWalls) {onLabChanged(newWalls); };
 
 	LoadStartingObjects();
 
@@ -102,11 +102,11 @@ bool Game::Run() {
 		for (GameObject* go : objectManager.GetAllObjects()) {
 			go->Update();
 		}
-		lab.Update();
+		lab->Update();
 
 		// Renderowanie obiektów
 		if (window != NULL) {
-			Render(lab);
+			Render();
 			window->Render();
 		}
 
@@ -114,6 +114,7 @@ bool Game::Run() {
 	}
 
 	SetRunning(false);
+	delete lab;
 	return true;
 }
 
@@ -208,6 +209,10 @@ GameObject* Game::GetPlayer(int id) {
 	return players[id];
 }
 
+LabyrinthSolidifier* Game::GetLab() const {
+	return lab;
+}
+
 void Game::Invoke(function<void()> fun) {
 	std::lock_guard<std::mutex> lock(invokesMutex);
 	invokes.push_back(std::move(fun));
@@ -237,7 +242,7 @@ void Game::SetRunning(bool running) {
 	isRunning = running;
 }
 
-void Game::Render(LabyrinthSolidifier& lab) {
+void Game::Render() {
 	for (GameObject* go : objectManager.GetAllObjects()) {
 		if (go->renderUnseen || controlledPlayer == NULL || controlledPlayer->FindComponent<Health>()->IsDead()) {
 			go->RenderUpdate();
@@ -249,7 +254,7 @@ void Game::Render(LabyrinthSolidifier& lab) {
 			continue;  // zbyt daleko
 
 		// Sprawdzenie, czy œciana stoi na drodze
-		bool canSee = !lab.GetColliderMemory().Raycast(
+		bool canSee = !lab->GetColliderMemory().Raycast(
 			controlledPlayer->GetMiddle(),
 			go->GetMiddle(),
 			go

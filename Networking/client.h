@@ -4,6 +4,7 @@
 #include "GameInfoReceiver.h"
 #include "../LabyrinthShooter/Shared.h"
 #include "../LabyrinthShooter/Vector.h"
+#include "../LabyrinthShooter/Labirynt.h"
 
 using std::function;
 
@@ -16,6 +17,7 @@ public:
 	function<void()> onPlayerJoined;
 	function<void()> onPlayerLeft;
 	function<void(int id)> onPlayerDead;
+	function<void(bool*)> onLabChanged;
 public:
 	Client(const char* address, int port);
 	void Connect();
@@ -45,5 +47,8 @@ private:
 	std::thread* contextThread;
 
 	bool disconnected = true;
+
+private:
+	void ReceiveMessageLabChanged(Message<WildMessage>& msg);
 };
 

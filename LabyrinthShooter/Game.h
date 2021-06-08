@@ -95,6 +95,8 @@ public:
 	GameObject* GetControlledPlayer();
 	GameObject* GetPlayer(int id);
 
+	LabyrinthSolidifier* GetLab() const;
+
 private:
 	bool isServer;
 
@@ -104,6 +106,7 @@ private:
 	GameObject** players = NULL;
 	size_t playerCount = 0;
 	GameObject* controlledPlayer = NULL;
+	LabyrinthSolidifier* lab;
 
 	GameStartInfo startInfo;
 	bool isRunning = false;
@@ -132,6 +135,6 @@ private:
 
 	void OnControlledDirectionChanged(const Vector& newDir);
 
-	void Render(LabyrinthSolidifier& lab);
+	void Render();
 
 };

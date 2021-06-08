@@ -227,6 +227,14 @@ GameObject** LabyrinthSolidifier::BuildGateWall(Direction side) {
 	return w;
 }
 
+void LabyrinthSolidifier::Start() {
+	if (!shouldChange)
+		return;
+
+	if (onChanged)
+		onChanged(labyrinth.getWalls());
+}
+
 void LabyrinthSolidifier::Update() {
 	if (!shouldChange)
 		return;

@@ -271,8 +271,10 @@ Message<WildMessage> Server::CreateMessageLabirynthChange(bool* newWalls) {
 	message.header.id = WildMessage::LABIRYNTH_CHANGE;
 
 	int wallsNum = Labirynt::MemorySize(LAB_X, LAB_Y);
-	bool* walls = new bool[wallsNum];
-	for (int i = wallsNum - 1; i >= 0; i--) message << walls[i];
+
+	for (int i = wallsNum - 1; i >= 0; i--) {
+		message << newWalls[i];
+	}
 
 	return message;
 }

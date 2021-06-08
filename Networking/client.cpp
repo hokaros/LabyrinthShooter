@@ -101,6 +101,7 @@ void Client::OnMessageReceived(const Message<WildMessage>& message) {
 	case WildMessage::WALL_DESTRUCTION:
 		break;
 	case WildMessage::LABIRYNTH_CHANGE:
+		ReceiveMessageLabChanged(msg);
 		break;
 	case WildMessage::END_OF_GAME:
 		break;
@@ -202,4 +203,16 @@ Message<WildMessage> Client::CreateMessagePlayerShot(double aimDir, FirearmType 
 	message.header.id = WildMessage::SHOT;
 	message << sourcePos << wpnType << aimDir;
 	return message;
+}
+
+
+// Odbieranie wiadomoœci
+void Client::ReceiveMessageLabChanged(Message<WildMessage>& msg) {
+	int wallsNum = Labirynt::MemorySize(LAB_X, LAB_Y);
+	bool* walls = new bool[wallsNum];
+
+	for (int i = 0; i < wallsNum; i++) msg >> walls[i];
+
+	if (onLabChanged)
+		onLabChanged(walls);
 }

@@ -198,6 +198,14 @@ void GameRoom::SubscribeToClient() {
 
 		game->Invoke([player, newType]() { player->FindComponent<PlayerEquipment>()->EquipWeapon(newType); });
 	};
+	client->onLabChanged = [this](bool* newWalls) {
+		printf("Lab changed\n");
+		if (game == NULL || !game->IsRunning())
+			return;
+
+		LabyrinthSolidifier* lab = game->GetLab();
+		game->Invoke([newWalls, lab]() {lab->SetLab(newWalls); });
+	};
 }
 
 void GameRoom::SubscribeToGame() {
