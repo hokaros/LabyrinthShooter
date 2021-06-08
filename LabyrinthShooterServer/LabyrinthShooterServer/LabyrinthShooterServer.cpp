@@ -4,11 +4,6 @@
 #include <SDL_main.h>
 #include "ServerSimulation.h"
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
-
-Window window(SCREEN_WIDTH, SCREEN_HEIGHT);
-
 Server* server;
 ServerSimulation* game;
 std::thread* serverThread;
@@ -24,7 +19,7 @@ void initServer() {
 			playerPositions[i] = Vector(positions[i][0], positions[i][1]);
 		}
 
-		game = new ServerSimulation(window, *server, GameStartInfo(playerPositions, PLAYERS_NUM, 0));
+		game = new ServerSimulation(NULL, *server, GameStartInfo(playerPositions, PLAYERS_NUM, 0));
 		gameThread = new std::thread([&]() {
 			game->Run();
 		});
@@ -36,9 +31,6 @@ void initServer() {
 
 int main()
 {
-	if (!window.Init())
-		return 1;
-
 	std::cout << "Server started\n";
 	initServer();
 

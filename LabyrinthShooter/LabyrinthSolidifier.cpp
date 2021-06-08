@@ -14,9 +14,11 @@ LabyrinthSolidifier::LabyrinthSolidifier(const Vector& pos,
 	colliderMemory(LabyrinthSize(wallWidth, wallLength, xCount, yCount).x + pos.x, LabyrinthSize(wallWidth, wallLength, xCount, yCount).y + pos.y)
 	{
 
-	SDL_Surface* screen = Window::Main()->GetScreen();
-	wallColor = SDL_MapRGB(screen->format, 0x00, 0x00, 0xAA);
-	gateColor = SDL_MapRGB(screen->format, 0x00, 0xCC, 0xAA);
+	if (Window::Main() != NULL) {
+		SDL_Surface* screen = Window::Main()->GetScreen();
+		wallColor = SDL_MapRGB(screen->format, 0x00, 0x00, 0xAA);
+		gateColor = SDL_MapRGB(screen->format, 0x00, 0xCC, 0xAA);
+	}
 
 	// Stworzenie œcian
 	walls = new GameObject * [labyrinth.ActiveCount()];
@@ -144,9 +146,11 @@ GameObject* LabyrinthSolidifier::BuildWall(const Vector& size) {
 GameObject* LabyrinthSolidifier::BuildWall(const Vector& size, int color) {
 	GameObject* wall = new GameObject(size, allObjects);
 
-	wall->SetRenderer(new RectangleRenderer(*wall, Window::Main()->GetScreen(), color, color));
 	wall->AddComponent(new Regenerable(*wall, WALL_REGEN));
 	wall->isStatic = true;
+
+	if (Window::Main() != NULL)
+		wall->SetRenderer(new RectangleRenderer(*wall, Window::Main()->GetScreen(), color, color));
 
 	return wall;
 }

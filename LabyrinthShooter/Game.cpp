@@ -1,22 +1,27 @@
 #include "Game.h"
 
-Game::Game(Window& window, GameStartInfo&& gameInfo, bool serverVersion)
+Game::Game(Window* window, GameStartInfo&& gameInfo, bool serverVersion)
 	: window(window), isServer(serverVersion),
 	basicBullet(Vector(4, 4), objectManager.GetAllObjects()), // uwa¿aæ przy zmienianiu objectManagera
 	superBullet(Vector(10, 10), objectManager.GetAllObjects()),
-	startInfo(std::move(gameInfo)),
-	healthStats(bitmaps.heartBmp, VectorInt(30, 30), VectorInt(3, 3)) {
+	startInfo(std::move(gameInfo)) {
 
-	SDL_Surface* screen = window.GetScreen();
+	if (!serverVersion) {
+		bitmaps = new GameBitmaps();
+		healthStats = new  BMPStats(bitmaps->heartBmp, VectorInt(30, 30), VectorInt(3, 3));
+	}
+	if (window != NULL) {
+		SDL_Surface* screen = window->GetScreen();
 
-	int red = SDL_MapRGB(screen->format, 0xFF, 0x00, 0x00);
-	int yellow = SDL_MapRGB(screen->format, 0xFF, 0xFF, 0x00);
+		int red = SDL_MapRGB(screen->format, 0xFF, 0x00, 0x00);
+		int yellow = SDL_MapRGB(screen->format, 0xFF, 0xFF, 0x00);
+
+		basicBullet.SetRenderer(new RectangleRenderer(basicBullet, screen, yellow, yellow));
+		superBullet.SetRenderer(new RectangleRenderer(superBullet, screen, red, red));
+	}
 
 	basicBullet.AddComponent(new Bullet(basicBullet, BULLET_BASIC_SPEED, BULLET_BASIC_DAMAGE));
-	basicBullet.SetRenderer(new RectangleRenderer(basicBullet, screen, yellow, yellow));
-
 	superBullet.AddComponent(new PowerBullet(superBullet, BULLET_SUPER_SPEED, BULLET_SUPER_DAMAGE));
-	superBullet.SetRenderer(new RectangleRenderer(superBullet, screen, red, red));
 }
 
 Game::~Game() {
@@ -47,8 +52,12 @@ void Game::LoadStartingObjects() {
 bool Game::Run() {
 	InputController* input = InputController::Main();
 
-	SDL_Surface* screen = window.GetScreen();
-	int black = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
+	int black = 0;
+	SDL_Surface* screen = NULL;
+	if (window != NULL) {
+		screen = window->GetScreen();
+		black = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
+	}
 
 	Vector mapStart(10, 10);
 	LabyrinthSolidifier lab(mapStart, WALL_THICKNESS, WALL_LENGTH, LAB_X, LAB_Y, objectManager.GetAllObjects(), LAB_TIME, isServer);
@@ -76,30 +85,30 @@ bool Game::Run() {
 		// Nowa klatka
 		timer.NextFrame();
 
-		if (input != NULL && !input->Update()) {
+		if (input != NULL && !input->Update())
 			return false;
-		}
 
-		if (input != NULL && input->PressedThisFrame(SDLK_ESCAPE)) {
+		if (input != NULL && input->PressedThisFrame(SDLK_ESCAPE))
 			quit = 1;
-		}
 
 		//generowanie t³a
-		SDL_FillRect(screen, NULL, black);
+		if(screen != NULL)
+			SDL_FillRect(screen, NULL, black);
 
 		// Wywo³anie zleconych akcji
 		InvokePostponed();
 
+		// Zaktualizowanie stanu gry
 		for (GameObject* go : objectManager.GetAllObjects()) {
 			go->Update();
 		}
+		lab.Update();
 
 		// Renderowanie obiektów
-		Render(lab);
-		
-
-		lab.Update();
-		window.Render();
+		if (window != NULL) {
+			Render(lab);
+			window->Render();
+		}
 
 		objectManager.DisposeDestroyed();
 	}
@@ -113,11 +122,9 @@ void Game::Clear() {
 }
 
 GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
-	SDL_Surface* screen = window.GetScreen();
 
 	// Obiekt gracza
 	GameObject* player = new GameObject(Vector(20, 20), position, objectManager.GetAllObjects());
-	player->SetRenderer(new SpriteRenderer(*player, screen, bitmaps.playerBmp));
 	ConstantMover* mover = new ConstantMover(*player, PLAYER_SPEED);
 	player->AddComponent(mover);
 	objectManager.AddObject(player);
@@ -129,7 +136,6 @@ GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
 		objectManager.GetAllObjects()
 	);
 	basicWeapon->AddComponent(new Firearm(*basicWeapon, basicBullet, WPN_BASIC_RELOAD, FirearmType::Basic));
-	basicWeapon->SetRenderer(new SpriteRenderer(*basicWeapon, screen, bitmaps.wpnBasicBmp));
 	player->AddChild(basicWeapon);
 	objectManager.AddObject(basicWeapon);
 
@@ -140,7 +146,6 @@ GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
 		objectManager.GetAllObjects()
 	);
 	superWeapon->AddComponent(new Firearm(*superWeapon, superBullet, WPN_SUPER_RELOAD, FirearmType::Super));
-	superWeapon->SetRenderer(new SpriteRenderer(*superWeapon, screen, bitmaps.wpnSuperBmp));
 	player->AddChild(superWeapon);
 	objectManager.AddObject(superWeapon);
 
@@ -148,8 +153,8 @@ GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
 	player->AddComponent(new PlayerEquipment(*player));
 	// Zdrowie
 	StatRenderer* healthRenderer = NULL;
-	if (isControlled) { // Wyœwietlamy zdrowie tylko gracza kontrolowanego przez tego klienta
-		healthRenderer = &healthStats;
+	if (isControlled && healthStats != NULL) { // Wyœwietlamy zdrowie tylko gracza kontrolowanego przez tego klienta
+		healthRenderer = healthStats;
 	}
 	Health* playerHealth = new Health(*player, MAX_HEALTH, healthRenderer);
 	player->AddComponent(playerHealth);
@@ -176,6 +181,14 @@ GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
 				onControlledWeaponChanged(newType);
 		};
 		mover->onDirectionChanged = [this](const Vector& newDir) {OnControlledDirectionChanged(newDir); };
+	}
+
+	if (window != NULL) {
+		SDL_Surface* screen = window->GetScreen();
+
+		player->SetRenderer(new SpriteRenderer(*player, screen, bitmaps->playerBmp));
+		basicWeapon->SetRenderer(new SpriteRenderer(*basicWeapon, screen, bitmaps->wpnBasicBmp));
+		superWeapon->SetRenderer(new SpriteRenderer(*superWeapon, screen, bitmaps->wpnSuperBmp));
 	}
 
 	return player;
@@ -246,7 +259,7 @@ void Game::Render(LabyrinthSolidifier& lab) {
 		}
 	}
 	// Renderowanie nak³adek UI
-	healthStats.Render();
+	healthStats->Render();
 }
 
 

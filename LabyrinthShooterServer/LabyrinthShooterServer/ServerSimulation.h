@@ -5,7 +5,7 @@
 class ServerSimulation
 {
 public:
-	ServerSimulation(Window& window, Server& server, GameStartInfo&& startInfo);
+	ServerSimulation(Window* window, Server& server, GameStartInfo&& startInfo);
 
 	void Run();
 

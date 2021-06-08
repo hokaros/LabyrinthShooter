@@ -1,6 +1,6 @@
 #include "ServerSimulation.h"
 
-ServerSimulation::ServerSimulation(Window& window, Server& server, GameStartInfo&& startInfo)
+ServerSimulation::ServerSimulation(Window* window, Server& server, GameStartInfo&& startInfo)
 	: server(server), game(window, std::move(startInfo), true) {
 	
 	SubscribeToServer();

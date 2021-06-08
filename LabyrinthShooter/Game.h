@@ -79,7 +79,7 @@ public:
 	function<void(bool*)> onLabChanged;
 
 public:
-	Game(Window& window, GameStartInfo&& gameInfo, bool serverVersion = false);
+	Game(Window* window, GameStartInfo&& gameInfo, bool serverVersion = false);
 	~Game();
 
 	// G³ówna pêtla gry. Zwraca fa³sz, jeœli w trakcie u¿ytkownik zamknie okno
@@ -98,7 +98,7 @@ public:
 private:
 	bool isServer;
 
-	Window& window;
+	Window* window = NULL;
 	Timer timer;
 	ObjectManager objectManager;
 	GameObject** players = NULL;
@@ -108,9 +108,9 @@ private:
 	GameStartInfo startInfo;
 	bool isRunning = false;
 
-	GameBitmaps bitmaps;
+	GameBitmaps* bitmaps = NULL;
 
-	BMPStats healthStats;
+	BMPStats* healthStats = NULL;
 
 	GameObject basicBullet; // TODO: przenieœæ prefaby do osobnej struktury
 	GameObject superBullet;
