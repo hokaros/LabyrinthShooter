@@ -48,7 +48,6 @@ void ColliderMemory::Claim(GameObject* collider) {
 
 
 void ColliderMemory::Free(GameObject* collider) {
-	printf("Freeing\n");
 	SetForCollider(collider, NULL);
 }
 

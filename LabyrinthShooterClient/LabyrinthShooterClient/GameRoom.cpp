@@ -70,7 +70,7 @@ void GameRoom::StartGame(int selfId, Vector* playerPositions, size_t playerCount
 	GameStartInfo gameInfo(positionsCpy, playerCount, selfId);
 
 	std::lock_guard<std::mutex> lock(mutex);
-	nextGame = new Game(window, std::move(gameInfo));
+	nextGame = new Game(&window, std::move(gameInfo));
 	startGame = true;
 }
 
