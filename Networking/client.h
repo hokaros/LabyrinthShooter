@@ -17,11 +17,11 @@ public:
 	function<void()> onPlayerJoined;
 	function<void()> onPlayerLeft;
 	function<void(int id, float positions[PLAYERS_NUM][2], bool* walls)> onGameStarted;
-	function<void(int id, Vector newDir)> onDirectionChanged;
+	function<void(int id, Vector newDir, Vector pos)> onDirectionChanged;
 	function<void(int id, FirearmType newType)> onWeaponChanged;
 	function<void(int id)> onPlayerDead;
 	function<void(int id, double rotation)> onAimChanged;
-	function<void(int id)> onShot;
+	function<void(int id, double dir, FirearmType, Vector pos)> onShot;
 public:
 	Client(const char* address, int port);
 	void Connect();
@@ -34,11 +34,12 @@ public:
 	static Message<WildMessage> CreateMessageWallDestruction(int x, int y);
 	static Message<WildMessage> CreateMessageLabirynthChange(bool* change, int size);
 	//Message<WildMessage> CreateMessagePosition(Vector pos, int id);
-	static Message<WildMessage> CreateMessageNewDirection(Vector direction);
+	static Message<WildMessage> CreateMessageNewDirection(Vector direction, Vector position);
 	static Message<WildMessage> CreateMessageWeaponChange(FirearmType type);
 	static Message<WildMessage> CreateMessageChangeOfAimingDirection(double aimDir);
 	static Message<WildMessage> CreateMessageJoinRequest();
-	static Message<WildMessage> CreateMessagePlayerShot();
+	static Message<WildMessage> CreateMessagePlayerShot(double aimDir, FirearmType wpnType, Vector sourcePos);
+
 	~Client();
 protected:
 	virtual void OnMessageReceived(const Message<WildMessage>& msg);

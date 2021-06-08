@@ -114,11 +114,11 @@ void Client::OnMessageReceived(const Message<WildMessage>& message) {
 		break;
 	case WildMessage::NEW_DIRECTION: {
 		// Odebranie kierunku, w którym zacz¹³ siê poruszaæ gracz i jego id
-		Vector dir;
-		msg >> id >> dir;
+		Vector dir, pos;
+		msg >> id >> dir >> pos;
 
 		if (onDirectionChanged)
-			onDirectionChanged(id, dir);
+			onDirectionChanged(id, dir, pos);
 		break;
 	}
 	case WildMessage::WEAPON_CHANGE: {
@@ -138,12 +138,16 @@ void Client::OnMessageReceived(const Message<WildMessage>& message) {
 			onAimChanged(id, rotation);
 		break;
 	}
-	case WildMessage::SHOT:
-		msg >> id;
+	case WildMessage::SHOT: {
+		double rot;
+		FirearmType wpnType;
+		Vector srcPos;
+		msg >> id >> rot >> wpnType >> srcPos;
 
 		if (onShot)
-			onShot(id);
+			onShot(id, rot, wpnType, srcPos);
 		break;
+	}
 	case WildMessage::JOIN_REQUEST:
 		break;
 	case WildMessage::JOIN_ACCEPT:
@@ -237,11 +241,11 @@ Message<WildMessage> Client::CreateMessageLabirynthChange(bool* change, int size
 	message << pos;
 	return message;
 };*/
-Message<WildMessage> Client::CreateMessageNewDirection(Vector direction) {
+Message<WildMessage> Client::CreateMessageNewDirection(Vector direction, Vector position) {
 
 	Message<WildMessage> message;
 	message.header.id = WildMessage::NEW_DIRECTION;
-	message << direction;
+	message << position << direction;
 	return message;
 };
 Message<WildMessage> Client::CreateMessageWeaponChange(FirearmType type) {
@@ -264,9 +268,10 @@ Message<WildMessage> Client::CreateMessageJoinRequest() {
 	message.header.id = WildMessage::JOIN_REQUEST;
 	return message;
 };
-Message<WildMessage> Client::CreateMessagePlayerShot() {
+Message<WildMessage> Client::CreateMessagePlayerShot(double aimDir, FirearmType wpnType, Vector sourcePos) {
 
 	Message<WildMessage> message;
 	message.header.id = WildMessage::SHOT;
+	message << sourcePos << wpnType << aimDir;
 	return message;
 }
