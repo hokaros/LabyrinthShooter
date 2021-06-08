@@ -107,6 +107,14 @@ void Client::OnMessageReceived(const Message<WildMessage>& message) {
 		break;
 	case WildMessage::POSITION:
 		break;
+	case WildMessage::PLAYER_HURT: {
+		int dmg;
+		msg >> id >> dmg;
+
+		if (onPlayerHurt)
+			onPlayerHurt(id, dmg);
+		break;
+	}
 	case WildMessage::PLAYER_DEATH:
 		msg >> id;
 

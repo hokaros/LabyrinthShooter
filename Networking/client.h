@@ -16,6 +16,7 @@ public:
 	function<void()> onJoinDenied;
 	function<void()> onPlayerJoined;
 	function<void()> onPlayerLeft;
+	function<void(int id, int dmg)> onPlayerHurt;
 	function<void(int id)> onPlayerDead;
 	function<void(bool*)> onLabChanged;
 public:

@@ -12,6 +12,7 @@
 class GameObject
 {
 public:
+	bool bumping = true;
 	bool renderUnseen = false;
 	// Czy obiekt ignoruje dzia³aj¹ce na niego si³y
 	bool isStatic = false;

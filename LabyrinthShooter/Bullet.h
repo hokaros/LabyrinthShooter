@@ -8,6 +8,9 @@ class Bullet :
 	public ObjectComponent
 {
 public:
+	function<void(GameObject&, int dmg)> onPlayerCollision;
+
+public:
 	Bullet(GameObject& owner, float speed, int damage);
 	void Update() override;
 

@@ -136,7 +136,9 @@ GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
 		player->GetPosition() + Vector(Direction::EAST) * player->GetSize().x,
 		objectManager.GetAllObjects()
 	);
-	basicWeapon->AddComponent(new Firearm(*basicWeapon, basicBullet, WPN_BASIC_RELOAD, FirearmType::Basic));
+	Firearm* basicFirearm = new Firearm(*basicWeapon, basicBullet, WPN_BASIC_RELOAD, FirearmType::Basic);
+	basicFirearm->onPlayerCollision = [this](GameObject& p, int dmg) {OnBulletPlayerHit(p, dmg); };
+	basicWeapon->AddComponent(basicFirearm);
 	player->AddChild(basicWeapon);
 	objectManager.AddObject(basicWeapon);
 
@@ -146,7 +148,9 @@ GameObject* Game::CreatePlayer(const Vector& position, bool isControlled) {
 		player->GetPosition() + Vector(Direction::EAST) * player->GetSize().x,
 		objectManager.GetAllObjects()
 	);
-	superWeapon->AddComponent(new Firearm(*superWeapon, superBullet, WPN_SUPER_RELOAD, FirearmType::Super));
+	Firearm* superFirearm = new Firearm(*superWeapon, superBullet, WPN_SUPER_RELOAD, FirearmType::Super);
+	superFirearm->onPlayerCollision = [this](GameObject& p, int dmg) {OnBulletPlayerHit(p, dmg); };
+	superWeapon->AddComponent(superFirearm);
 	player->AddChild(superWeapon);
 	objectManager.AddObject(superWeapon);
 
@@ -209,6 +213,15 @@ GameObject* Game::GetPlayer(int id) {
 	return players[id];
 }
 
+int Game::GetPlayerIndex(GameObject* player) const {
+	for (int i = 0; i < playerCount; i++) {
+		if (players[i] == player)
+			return i;
+	}
+
+	return -1;
+}
+
 LabyrinthSolidifier* Game::GetLab() const {
 	return lab;
 }
@@ -230,6 +243,23 @@ void Game::InvokePostponed() {
 void Game::OnControlledDirectionChanged(const Vector& newDir) {
 	if (onControlledDirectionChanged)
 		onControlledDirectionChanged(newDir);
+}
+
+void Game::OnBulletPlayerHit(GameObject& player, int dmg) {
+	if (!isServer)
+		return;
+
+	printf("A player got hit for %d hp\n", dmg);
+	int id = GetPlayerIndex(&player);
+	if (id == -1) {
+		printf("I don't know this guy\n");
+		return;
+	}
+
+	player.FindComponent<Health>()->Hurt(dmg);
+
+	if(onPlayerHurt)
+		onPlayerHurt(id, dmg);
 }
 
 bool Game::IsRunning() {

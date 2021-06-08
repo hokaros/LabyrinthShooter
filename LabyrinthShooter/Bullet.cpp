@@ -20,11 +20,12 @@ void Bullet::Update() {
 void Bullet::OnCollision(GameObject& collider) {
 	// Obs³uga trafienia gracza
 	Health* playerHealth = collider.FindComponent<Health>();
-	if (playerHealth != NULL) {
-		playerHealth->Hurt(damage);
+	if (playerHealth != NULL && onPlayerCollision) {
+		printf("Bullet collided with a player\n");
+		onPlayerCollision(collider, damage);
 	}
 
-	ObjectManager::Main()->DestroyObject(&gameObject);
+	ObjectManager::Main()->DestroyObject(&gameObject); // zniszczenie pocisku
 }
 
 ObjectComponent* Bullet::Copy(GameObject& newOwner) {

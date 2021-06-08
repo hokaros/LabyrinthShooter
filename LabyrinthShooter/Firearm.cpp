@@ -29,7 +29,12 @@ bool Firearm::TryShoot() {
 	bullet->Rotate(gameObject.GetRotation());
 
 	// Nadanie kierunku lotu
-	bullet->FindComponent<Bullet>()->SetDirection(gameObject.LookingDirection());
+	Bullet* b = bullet->FindComponent<Bullet>();
+	b->SetDirection(gameObject.LookingDirection());
+
+	// Zachowanie po kolizji
+	b->onPlayerCollision = onPlayerCollision;
+	bullet->bumping = false;
 
 	// Aktualizacja info o prze³adowaniu
 	timeSinceLastShot = 0.0f;

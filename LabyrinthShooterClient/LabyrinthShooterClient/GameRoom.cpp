@@ -206,6 +206,17 @@ void GameRoom::SubscribeToClient() {
 		LabyrinthSolidifier* lab = game->GetLab();
 		game->Invoke([newWalls, lab]() {lab->SetLab(newWalls); });
 	};
+	client->onPlayerHurt = [this](int id, int dmg) {
+		printf("Player %d hurt by %d hp\n", id, dmg);
+		if (game == NULL || !game->IsRunning())
+			return;
+
+		GameObject* player = game->GetPlayer(id);
+		if (player == NULL)
+			return;
+
+		game->Invoke([player, dmg]() { player->FindComponent<Health>()->Hurt(dmg); });
+	};
 }
 
 void GameRoom::SubscribeToGame() {

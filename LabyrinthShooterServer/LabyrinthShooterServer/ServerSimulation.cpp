@@ -15,6 +15,9 @@ void ServerSimulation::SubscribeToGame() {
 	game.onLabChanged = [this](bool* walls) {
 		server.MessageAllClients(Server::CreateMessageLabirynthChange(walls));
 	};
+	game.onPlayerHurt = [this](int id, int dmg) {
+		server.MessageAllClients(Server::CreateMessagePlayerHurt(id, dmg));
+	};
 }
 
 void ServerSimulation::SubscribeToServer() {

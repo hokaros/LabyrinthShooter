@@ -8,6 +8,9 @@ class Firearm :
 	public ObjectComponent
 {
 public:
+	function<void(GameObject&, int dmg)> onPlayerCollision; // zdarzenie, gdy pocisk trafi w gracza
+
+public:
 	Firearm(GameObject& owner, const GameObject& bulletPrefab, float reloadTime, FirearmType type);
 
 	void Update() override;

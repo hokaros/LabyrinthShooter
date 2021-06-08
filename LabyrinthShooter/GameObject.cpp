@@ -401,7 +401,7 @@ void GameObject::HandleCollisions() {
 				go->onCollision(*this);
 			}
 
-			if (!go->isStatic) {
+			if (!go->isStatic && go->bumping && bumping) {
 				BumpOut(*go);
 			}
 		}

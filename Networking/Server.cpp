@@ -208,8 +208,8 @@ void Server::GenerateAndSendPositions() {
 		while (true) {
 
 			bool inValidPosition = false;
-			tmpX = (float(std::rand()) / float((RAND_MAX)) * WIDTH);
-			tmpY = (float(std::rand()) / float((RAND_MAX)) * HEIGHT);
+			tmpX = (float(std::rand()) / float((RAND_MAX)) * WIDTH) + MAP_START_X;
+			tmpY = (float(std::rand()) / float((RAND_MAX)) * HEIGHT) + MAP_START_Y;
 
 			for (int j = 0; j < posX.size(); j++) {
 				if (abs(posX[j] - tmpX) < offsetX && abs(posY[j] - tmpY) < offsetY) inValidPosition = true;
@@ -275,6 +275,15 @@ Message<WildMessage> Server::CreateMessageLabirynthChange(bool* newWalls) {
 	for (int i = wallsNum - 1; i >= 0; i--) {
 		message << newWalls[i];
 	}
+
+	return message;
+}
+
+Message<WildMessage> Server::CreateMessagePlayerHurt(int id, int dmg) {
+	Message<WildMessage> message;
+	message.header.id = WildMessage::PLAYER_HURT;
+
+	message << dmg << id;
 
 	return message;
 }

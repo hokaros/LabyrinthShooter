@@ -77,6 +77,7 @@ public:
 	function<void()> onControlledShot;
 	function<void(FirearmType)> onControlledWeaponChanged;
 	function<void(bool*)> onLabChanged;
+	function<void(int id, int dmg)> onPlayerHurt;
 
 public:
 	Game(Window* window, GameStartInfo&& gameInfo, bool serverVersion = false);
@@ -94,6 +95,7 @@ public:
 
 	GameObject* GetControlledPlayer();
 	GameObject* GetPlayer(int id);
+	int GetPlayerIndex(GameObject* player) const;
 
 	LabyrinthSolidifier* GetLab() const;
 
@@ -134,6 +136,7 @@ private:
 	void InvokePostponed();
 
 	void OnControlledDirectionChanged(const Vector& newDir);
+	void OnBulletPlayerHit(GameObject& player, int dmg);
 
 	void Render();
 
