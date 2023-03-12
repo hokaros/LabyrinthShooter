@@ -34,8 +34,7 @@ void Server::WaitForClientConnection() {
 				OnMessageReceived(clientId, msg); 
 			};
 			newConnection->onDisconnected = [this](int clientId) { 
-				if(onClientDisconnected) 
-					onClientDisconnected(clientId); 
+				OnClientDisconnected(clientId);
 			};
 
 			connections.push_back(newConnection);
@@ -130,17 +129,7 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 	{
 		//	Dodanie gracza do tablicy
 		ConnectionHandler<WildMessage>* connection = clientIdMap[clientId];
-		bool joined = false;
-		for (int i = 0; i < PLAYERS_NUM; i++)
-		{
-			if (players[i] == NULL)
-			{
-				players[i] = connection;
-				clientIdIndexMap[clientId] = i;
-				joined = true;
-				break;
-			}
-		}
+		bool joined = TryAddPlayer(connection, clientId);
 
 		Message<WildMessage> msg;
 
@@ -165,6 +154,14 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 		break;
 	default: break;
 	}
+}
+
+void Server::OnClientDisconnected(int clientId)
+{
+	RemovePlayer(clientId);
+
+	if (onClientDisconnected)
+		onClientDisconnected(clientId);
 }
 
 bool Server::playersReady()
@@ -230,6 +227,27 @@ void Server::GenerateAndSendPositions() {
 		msg << posX[i];
 	}
 	MessageAllClients(msg);*/
+}
+
+bool Server::TryAddPlayer(ConnectionHandler<WildMessage>* connection, int clientId)
+{
+	for (int i = 0; i < PLAYERS_NUM; i++)
+	{
+		if (players[i] == NULL)
+		{
+			players[i] = connection;
+			clientIdIndexMap[clientId] = i;
+			return true; // Successfully added
+		}
+	}
+
+	return false;
+}
+
+void Server::RemovePlayer(int clientId)
+{
+	int playerIndex = clientIdIndexMap[clientId];
+	players[playerIndex] = NULL;
 }
 
 void Server::MessageAllClients(const Message<WildMessage>& message) {

@@ -35,8 +35,7 @@ public:
 
 	void OpenInput() {
 		if (!socket.is_open()) {
-			if (onDisconnected)
-				onDisconnected(id);
+			OnDisconnected();
 			return;
 		}
 
@@ -45,6 +44,9 @@ public:
 				if (!ec) {
 					OnRead(length);
 					OpenInput(); // czytaj dalej
+				}
+				else {
+					OnDisconnected();
 				}
 			});
 	}
@@ -134,6 +136,11 @@ private:
 
 		delete currentHeader;
 		currentHeader = NULL;
+	}
+
+	void OnDisconnected() {
+		if (onDisconnected)
+			onDisconnected(id);
 	}
 
 	void SendMessages() {

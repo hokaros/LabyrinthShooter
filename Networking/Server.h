@@ -44,13 +44,19 @@ public:
 	static Message<WildMessage> CreateMessagePlayerDeath(int id);
 	static Message<WildMessage> CreateMessageLabirynthChange(bool* newWalls);
 	static Message<WildMessage> CreateMessagePlayerHurt(int id, int dmg);
+
 protected:
 	void OnMessageReceived(int clientId, const Message<WildMessage>& message);
+
 private:
+	void OnClientDisconnected(int clientId);
 
 	bool playersReady();
 	void initGame();
 	void GenerateAndSendPositions();
+
+	bool TryAddPlayer(ConnectionHandler<WildMessage>* connection, int clientId);
+	void RemovePlayer(int clientId);
 
 	int lastClientId = 0;
 

@@ -53,5 +53,3 @@ private:
 	void OnPlayerLeft();
 	void OnGameStarted(int selfId, float positions[PLAYERS_NUM][2]);
 };
-
-
