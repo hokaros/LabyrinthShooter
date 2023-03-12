@@ -28,23 +28,7 @@ void Server::WaitForClientConnection() {
 	acceptor.async_accept([&](asio::error_code ec, asio::ip::tcp::socket socket) {
 		if (!ec) {
 			ConnectionHandler<WildMessage>* newConnection = new ConnectionHandler<WildMessage>(++lastClientId, context, std::move(socket));
-			// Subskrypcja zdarzeñ
-			newConnection->onMessageReceived = 
-				[this](int clientId, const Message<WildMessage>& msg) {
-				OnMessageReceived(clientId, msg); 
-			};
-			newConnection->onDisconnected = [this](int clientId) { 
-				OnClientDisconnected(clientId);
-			};
-
-			connections.push_back(newConnection);
-			if (onClientConnected)
-				onClientConnected(lastClientId);
-			//	Dodanie do slownika powiazania id z ConnectionHandler
-			clientIdMap[lastClientId] = newConnection;
-
-			
-			newConnection->OpenInput();
+			SaveNewConnection(newConnection);
 		}
 
 		WaitForClientConnection();
@@ -154,6 +138,31 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 		break;
 	default: break;
 	}
+}
+
+void Server::SaveNewConnection(ConnectionHandler<WildMessage>* newConnection)
+{
+	SubscribeToConnectionEvents(newConnection);
+
+	connections.push_back(newConnection);
+	//	Dodanie do slownika powiazania id z ConnectionHandler
+	clientIdMap[lastClientId] = newConnection;
+
+	newConnection->OpenInput();
+
+	if (onClientConnected)
+		onClientConnected(lastClientId);
+}
+
+void Server::SubscribeToConnectionEvents(ConnectionHandler<WildMessage>* connection)
+{
+	connection->onMessageReceived =
+		[this](int clientId, const Message<WildMessage>& msg) {
+		OnMessageReceived(clientId, msg);
+	};
+	connection->onDisconnected = [this](int clientId) {
+		OnClientDisconnected(clientId);
+	};
 }
 
 void Server::OnClientDisconnected(int clientId)

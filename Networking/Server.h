@@ -49,6 +49,9 @@ protected:
 	void OnMessageReceived(int clientId, const Message<WildMessage>& message);
 
 private:
+	void SaveNewConnection(ConnectionHandler<WildMessage>* newConnection);
+	void SubscribeToConnectionEvents(ConnectionHandler<WildMessage>* connection);
+
 	void OnClientDisconnected(int clientId);
 
 	bool ArePlayersReady();
