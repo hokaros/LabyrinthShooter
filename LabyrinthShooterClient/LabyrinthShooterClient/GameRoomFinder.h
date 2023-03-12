@@ -8,7 +8,7 @@ public:
 	GameRoomFinder(Window& window);
 	~GameRoomFinder();
 
-	void EnterSearch();
+	void SearchLoop();
 	void EnterGameRoom();
 
 	GameRoom* GetCurrentRoom();
@@ -24,6 +24,7 @@ private:
 
 private:
 	void Draw(TextBox& textBox);
+	TextBox CreateIpTextBox();
 
 	void SetCurrentRoom(GameRoom* newRoom);
 	// Konsumuj¹ce sprawdzenie sygna³u do wejœcia do pokoju

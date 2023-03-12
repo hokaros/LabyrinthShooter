@@ -39,7 +39,7 @@ int main()
 	InputController input(steeringKeys, sizeof(steeringKeys) / sizeof(SDL_Keycode));
 
 	GameRoomFinder roomFinder(window);
-	roomFinder.EnterSearch();
+	roomFinder.SearchLoop();
 
 	return 0;
 }

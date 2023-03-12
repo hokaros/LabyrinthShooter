@@ -11,18 +11,11 @@ GameRoomFinder::~GameRoomFinder() {
 	}
 }
 
-void GameRoomFinder::EnterSearch() {
+void GameRoomFinder::SearchLoop() {
 	SDL_Surface* screen = window.GetScreen();
-	int white = SDL_MapRGB(screen->format, 0xFF, 0xFF, 0xFF);
 	int black = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
 
-	SDL_Rect textArea;
-	textArea.x = 50;
-	textArea.y = window.GetHeight() / 2;
-	textArea.w = window.GetWidth() - 2 * 50;
-	textArea.h = 50;
-	TextBox textBox(textArea, white, black, 20);
-
+	TextBox ipTextBox = CreateIpTextBox();
 
 	InputController* input = InputController::Main();
 
@@ -36,7 +29,7 @@ void GameRoomFinder::EnterSearch() {
 
 		if (input->PressedThisFrame(SDLK_RETURN)) {
 			// Testowa próba po³¹czenia z serwerem
-			TryConnect(textBox.GetContent());
+			TryConnect(ipTextBox.GetContent());
 		}
 		else if (input->PressedThisFrame(SDLK_ESCAPE)) {
 			quit = true;
@@ -45,10 +38,10 @@ void GameRoomFinder::EnterSearch() {
 		// Generowanie t³a
 		SDL_FillRect(screen, NULL, black);
 
-		textBox.Update();
+		ipTextBox.Update();
 
 		// Wyœwietlenie wyszukiwarki
-		Draw(textBox);
+		Draw(ipTextBox);
 
 		window.Render();
 
@@ -110,4 +103,18 @@ void GameRoomFinder::Draw(TextBox& textBox) {
 	window.DrawString(window.GetWidth() / 2 - FONTSIZE_HEADER * 9, 50, "Podaj ip serwera:", FONTSIZE_HEADER);
 
 	textBox.Draw();
+}
+
+TextBox GameRoomFinder::CreateIpTextBox()
+{
+	SDL_Surface* screen = window.GetScreen();
+	int white = SDL_MapRGB(screen->format, 0xFF, 0xFF, 0xFF);
+	int black = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
+
+	SDL_Rect ipTextArea;
+	ipTextArea.x = 50;
+	ipTextArea.y = window.GetHeight() / 2;
+	ipTextArea.w = window.GetWidth() - 2 * 50;
+	ipTextArea.h = 50;
+	return TextBox(ipTextArea, white, black, 20);
 }
