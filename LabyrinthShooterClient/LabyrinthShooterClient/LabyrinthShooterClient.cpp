@@ -4,6 +4,7 @@
 #include <SDL_main.h>
 #include <client.h>
 #include "GameRoom.h"
+#include "GameRoomFinder.h"
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
@@ -37,7 +38,7 @@ int main()
 	};
 	InputController input(steeringKeys, sizeof(steeringKeys) / sizeof(SDL_Keycode));
 
-	RoomFinder roomFinder(window);
+	GameRoomFinder roomFinder(window);
 	roomFinder.EnterSearch();
 
 	return 0;
