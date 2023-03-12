@@ -51,9 +51,9 @@ protected:
 private:
 	void OnClientDisconnected(int clientId);
 
-	bool playersReady();
-	void initGame();
-	void GenerateAndSendPositions();
+	bool ArePlayersReady();
+	void InitGame();
+	void GeneratePlayerPositions();
 
 	bool TryAddPlayer(ConnectionHandler<WildMessage>* connection, int clientId);
 	void RemovePlayer(int clientId);

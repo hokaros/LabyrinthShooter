@@ -138,7 +138,7 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 
 		connection->WriteMessage(msg);
 
-		if (playersReady()) initGame();
+		if (ArePlayersReady()) InitGame();
 
 		break;
 	}
@@ -164,7 +164,7 @@ void Server::OnClientDisconnected(int clientId)
 		onClientDisconnected(clientId);
 }
 
-bool Server::playersReady()
+bool Server::ArePlayersReady()
 {
 	bool ready = true;
 	for (int i = 0; i < PLAYERS_NUM; i++)
@@ -177,9 +177,9 @@ bool Server::playersReady()
 	return true;
 }
 
-void Server::initGame()
+void Server::InitGame()
 {
-	GenerateAndSendPositions();
+	GeneratePlayerPositions();
 	for (int i = 0; i < PLAYERS_NUM; i++)
 	{
 		Message<WildMessage> message = CreateMessageGameInit(i);
@@ -190,29 +190,25 @@ void Server::initGame()
 	}
 }
 
-void Server::GenerateAndSendPositions() {
+void Server::GeneratePlayerPositions() {
 
 	srand((unsigned int)time(NULL));
 	const float offsetX = 50;
 	const float offsetY = 50;
 
-	float tmpX;
-	float tmpY;
-
-
 	for (int i = 0; i < PLAYERS_NUM; i++) {
 
 		while (true) {
 
-			bool inValidPosition = false;
-			tmpX = (float(std::rand()) / float((RAND_MAX)) * WIDTH) + MAP_START_X;
-			tmpY = (float(std::rand()) / float((RAND_MAX)) * HEIGHT) + MAP_START_Y;
+			bool invalidPosition = false;
+			float tmpX = (float(std::rand()) / float((RAND_MAX)) * WIDTH) + MAP_START_X;
+			float tmpY = (float(std::rand()) / float((RAND_MAX)) * HEIGHT) + MAP_START_Y;
 
 			for (int j = 0; j < posX.size(); j++) {
-				if (abs(posX[j] - tmpX) < offsetX && abs(posY[j] - tmpY) < offsetY) inValidPosition = true;
+				if (abs(posX[j] - tmpX) < offsetX && abs(posY[j] - tmpY) < offsetY) invalidPosition = true;
 			}
 
-			if (!inValidPosition) {
+			if (!invalidPosition) {
 				posY.push_back(tmpY);
 				posX.push_back(tmpX);
 				break;
