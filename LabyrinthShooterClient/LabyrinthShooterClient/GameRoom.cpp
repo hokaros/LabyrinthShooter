@@ -154,7 +154,7 @@ void GameRoom::SubscribeToClient() {
 		if (player == NULL || player == game->GetControlledPlayer())
 			return;
 
-		game->Invoke([player, newDir, pos]() {
+		game->InvokeOnNextFrame([player, newDir, pos]() {
 			player->SetPosition(pos);
 			player->FindComponent<ConstantMover>()->SetDirection(newDir); 
 			});
@@ -179,7 +179,7 @@ void GameRoom::SubscribeToClient() {
 		if (player == NULL || player == game->GetControlledPlayer())
 			return;
 
-		game->Invoke([player, dir, wpnType, pos]() { 
+		game->InvokeOnNextFrame([player, dir, wpnType, pos]() {
 			player->SetRotation(dir);
 			player->SetPosition(pos);
 			PlayerEquipment* eq = player->FindComponent<PlayerEquipment>();
@@ -196,7 +196,7 @@ void GameRoom::SubscribeToClient() {
 		if (player == NULL || player == game->GetControlledPlayer())
 			return;
 
-		game->Invoke([player, newType]() { player->FindComponent<PlayerEquipment>()->EquipWeapon(newType); });
+		game->InvokeOnNextFrame([player, newType]() { player->FindComponent<PlayerEquipment>()->EquipWeapon(newType); });
 	};
 	client->onLabChanged = [this](bool* newWalls) {
 		printf("Lab changed\n");
@@ -204,7 +204,7 @@ void GameRoom::SubscribeToClient() {
 			return;
 
 		LabyrinthSolidifier* lab = game->GetLab();
-		game->Invoke([newWalls, lab]() {lab->SetLab(newWalls); });
+		game->InvokeOnNextFrame([newWalls, lab]() {lab->SetLab(newWalls); });
 	};
 	client->onPlayerHurt = [this](int id, int dmg) {
 		printf("Player %d hurt by %d hp\n", id, dmg);
@@ -215,7 +215,7 @@ void GameRoom::SubscribeToClient() {
 		if (player == NULL)
 			return;
 
-		game->Invoke([player, dmg]() { player->FindComponent<Health>()->Hurt(dmg); });
+		game->InvokeOnNextFrame([player, dmg]() { player->FindComponent<Health>()->Hurt(dmg); });
 	};
 }
 

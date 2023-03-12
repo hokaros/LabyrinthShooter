@@ -49,7 +49,7 @@ void Timer::Unpause() {
 	paused = false;
 }
 
-void Timer::Invoke(function<void()> action, double time) {
+void Timer::InvokeOnNextFrame(function<void()> action, double time) {
 	invokeQueue.Add(action, time);
 }
 

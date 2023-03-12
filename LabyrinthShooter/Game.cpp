@@ -226,7 +226,7 @@ LabyrinthSolidifier* Game::GetLab() const {
 	return lab;
 }
 
-void Game::Invoke(function<void()> fun) {
+void Game::InvokeOnNextFrame(function<void()> fun) {
 	std::lock_guard<std::mutex> lock(invokesMutex);
 	invokes.push_back(std::move(fun));
 }

@@ -90,8 +90,7 @@ public:
 	// Usuwa wszystkie obiekty
 	void Clear();
 
-	// Wywo³uje funkcjê w najbli¿szej klatce
-	void Invoke(function<void()> fun);
+	void InvokeOnNextFrame(function<void()> fun);
 
 	GameObject* GetControlledPlayer();
 	GameObject* GetPlayer(int id);
