@@ -2,10 +2,10 @@
 #include <thread>
 #include <deque>
 #include <map>
-#include <ctime>
 #include <vector>
 #include "../LabyrinthShooter/Shared.h"
 #include "../LabyrinthShooter/Labirynt.h"
+#include "../LabyrinthShooter/PlayerPositionsGenerator.h"
 
 #include "ConnectionHandler.h"
 #include "Message.h"
@@ -39,7 +39,7 @@ public:
 	void Stop();
 	~Server();
 
-	Message<WildMessage> CreateMessageGameInit(int id);
+	Message<WildMessage> CreateMessageGameInit(int id, const std::vector<Vector> playerPositions);
 
 	static Message<WildMessage> CreateMessagePlayerDeath(int id);
 	static Message<WildMessage> CreateMessageLabirynthChange(bool* newWalls);
@@ -53,7 +53,6 @@ private:
 
 	bool ArePlayersReady();
 	void InitGame();
-	void GeneratePlayerPositions();
 
 	bool TryAddPlayer(ConnectionHandler<WildMessage>* connection, int clientId);
 	void RemovePlayer(int clientId);
@@ -69,8 +68,6 @@ private:
 	std::map<int, ConnectionHandler<WildMessage>*> clientIdMap;
 	std::map<int, int> clientIdIndexMap;
 	std::thread* contextThread;
-	std::vector<float> posX;
-	std::vector<float> posY;
 
 	ConnectionHandler<WildMessage>* players[PLAYERS_NUM];
 private:

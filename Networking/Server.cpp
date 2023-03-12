@@ -179,50 +179,17 @@ bool Server::ArePlayersReady()
 
 void Server::InitGame()
 {
-	GeneratePlayerPositions();
+	PlayerPositionsGenerator positionsGenerator;
+	positionsGenerator.Generate(PLAYERS_NUM, WIDTH, HEIGHT, MAP_START_X, MAP_START_Y);
+
 	for (int i = 0; i < PLAYERS_NUM; i++)
 	{
-		Message<WildMessage> message = CreateMessageGameInit(i);
+		Message<WildMessage> message = CreateMessageGameInit(i, positionsGenerator.GetPlayerPositions());
 		players[i]->WriteMessage(message);
 
 		if (i == 0)
 			ReceiveMessageGameStarted(message); // przetworzenie przez serwer
 	}
-}
-
-void Server::GeneratePlayerPositions() {
-
-	srand((unsigned int)time(NULL));
-	const float offsetX = 50;
-	const float offsetY = 50;
-
-	for (int i = 0; i < PLAYERS_NUM; i++) {
-
-		while (true) {
-
-			bool invalidPosition = false;
-			float tmpX = (float(std::rand()) / float((RAND_MAX)) * WIDTH) + MAP_START_X;
-			float tmpY = (float(std::rand()) / float((RAND_MAX)) * HEIGHT) + MAP_START_Y;
-
-			for (int j = 0; j < posX.size(); j++) {
-				if (abs(posX[j] - tmpX) < offsetX && abs(posY[j] - tmpY) < offsetY) invalidPosition = true;
-			}
-
-			if (!invalidPosition) {
-				posY.push_back(tmpY);
-				posX.push_back(tmpX);
-				break;
-			}
-		}
-	}
-
-	/*Message<WildMessage> msg;
-	msg.header.id = WildMessage::POSITION;
-	for (int i = PLAYERS_NUM - 1; i >= 0; i--) {
-		msg << posY[i];
-		msg << posX[i];
-	}
-	MessageAllClients(msg);*/
 }
 
 bool Server::TryAddPlayer(ConnectionHandler<WildMessage>* connection, int clientId)
@@ -255,20 +222,17 @@ void Server::MessageAllClients(const Message<WildMessage>& message) {
 }
 
 //	Creating message functions
-Message<WildMessage> Server::CreateMessageGameInit(int id) {
+Message<WildMessage> Server::CreateMessageGameInit(int id, const std::vector<Vector> playerPositions) {
 
 	Message<WildMessage> message;
 	message.header.id = WildMessage::GAME_STARTED;
-	//	TODO
-
 
 	for (int i = PLAYERS_NUM - 1; i >= 0; i--) {
-		message << posY[i];
-		message << posX[i];
+		message << playerPositions[i].y;
+		message << playerPositions[i].x;
 	}
 
 	message << id;
-	//
 	return message;
 };
 
