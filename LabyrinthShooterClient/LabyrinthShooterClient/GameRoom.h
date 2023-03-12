@@ -8,8 +8,6 @@
 #define FONTSIZE_HEADER 25
 #define FONTSIZE_MEDIUM 14
 
-#define NEEDED_PLAYERS 4
-
 #define DEFAULT_PORT 80
 
 class GameRoom
