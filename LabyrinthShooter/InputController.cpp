@@ -6,9 +6,9 @@ InputController* InputController::Main() {
 	return main;
 }
 
-InputController::InputController(SDL_KeyCode* managedKeys, size_t keysCount)
+InputController::InputController(SDL_Keycode* managedKeys, size_t keysCount)
 	: keysCount(keysCount),
-	managedKeys(new SDL_KeyCode[keysCount]),
+	managedKeys(new SDL_Keycode[keysCount]),
 	keyDownInfo(new bool[keysCount]),
 	pressedThisFrame(new bool[keysCount]) {
 
@@ -17,7 +17,7 @@ InputController::InputController(SDL_KeyCode* managedKeys, size_t keysCount)
 	}
 
 
-	std::memcpy(this->managedKeys, managedKeys, keysCount * sizeof(SDL_KeyCode));
+	std::memcpy(this->managedKeys, managedKeys, keysCount * sizeof(SDL_Keycode));
 	for (size_t i = 0; i < keysCount; i++) {
 		keyDownInfo[i] = false;
 		pressedThisFrame[i] = false;
@@ -62,7 +62,7 @@ bool InputController::Update() {
 	return !quit;
 }
 
-bool InputController::IsKeyDown(SDL_KeyCode key) const {
+bool InputController::IsKeyDown(SDL_Keycode key) const {
 	int index = KeyIndex(key);
 	if (index < 0)
 		return false; // nie nale¿y do zarz¹dzanych klawiszy
@@ -70,7 +70,7 @@ bool InputController::IsKeyDown(SDL_KeyCode key) const {
 	return keyDownInfo[index];
 }
 
-bool InputController::PressedThisFrame(SDL_KeyCode key) const {
+bool InputController::PressedThisFrame(SDL_Keycode key) const {
 	int index = KeyIndex(key);
 	if (index < 0)
 		return false;
@@ -85,7 +85,7 @@ Vector InputController::GetMousePosition() const {
 	return Vector(x, y);
 }
 
-int InputController::KeyIndex(SDL_KeyCode key) const {
+int InputController::KeyIndex(SDL_Keycode key) const {
 	for (size_t i = 0; i < keysCount; i++) {
 		if (managedKeys[i] == key) {
 			return i;
