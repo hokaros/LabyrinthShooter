@@ -21,19 +21,8 @@ void ServerSimulation::SubscribeToGame() {
 }
 
 void ServerSimulation::SubscribeToServer() {
-	server.onDirectionChanged = [this](int id, Vector newDir, Vector pos) {
-		printf("Direction changed of player %d\n", id);
-		if (!game.IsRunning())
-			return;
-
-		GameObject* player = game.GetPlayer(id);
-		if (player == NULL || player == game.GetControlledPlayer())
-			return;
-
-		game.Invoke([player, newDir, pos]() {
-			player->SetPosition(pos);
-			player->FindComponent<ConstantMover>()->SetDirection(newDir);
-			});
+	server.onDirectionChanged = [this](int playerId, Vector newDir, Vector pos) {
+		OnDirectionChanged(playerId, newDir, pos);
 	};/*
 	client->onAimChanged = [this](int id, double rotation) {
 		printf("Aiming changed of player %d\n", id);
@@ -46,32 +35,59 @@ void ServerSimulation::SubscribeToServer() {
 
 		game->Invoke([player, rotation]() { player->SetRotation(rotation); });
 	};*/
-	server.onShot = [this](int id, double dir, FirearmType wpnType, Vector pos) {
-		printf("Player %d shot\n", id);
-		if (!game.IsRunning())
-			return;
-
-		GameObject* player = game.GetPlayer(id);
-		if (player == NULL || player == game.GetControlledPlayer())
-			return;
-
-		game.Invoke([player, dir, wpnType, pos]() {
-			player->SetRotation(dir);
-			player->SetPosition(pos);
-			PlayerEquipment* eq = player->FindComponent<PlayerEquipment>();
-			eq->EquipWeapon(wpnType);
-			eq->GetCurrentWeapon()->TryShoot();
-			});
+	server.onShot = [this](int playerId, double dir, FirearmType wpnType, Vector pos) {
+		OnShot(playerId, dir, wpnType, pos);
 	};
-	server.onWeaponChanged = [this](int id, FirearmType newType) {
-		printf("Player %d changed weapon\n", id);
-		if (!game.IsRunning())
-			return;
-
-		GameObject* player = game.GetPlayer(id);
-		if (player == NULL || player == game.GetControlledPlayer())
-			return;
-
-		game.Invoke([player, newType]() { player->FindComponent<PlayerEquipment>()->EquipWeapon(newType); });
+	server.onWeaponChanged = [this](int playerId, FirearmType newType) {
+		OnWeaponChanged(playerId, newType);
 	};
+}
+
+void ServerSimulation::OnDirectionChanged(int playerId, Vector newDir, Vector pos)
+{
+	printf("Direction changed of player %d\n", playerId);
+	if (!game.IsRunning())
+		return;
+
+	GameObject* player = game.GetPlayer(playerId);
+	if (player == NULL || player == game.GetControlledPlayer())
+		return;
+
+	game.InvokeOnNextFrame([player, newDir, pos]() {
+		player->SetPosition(pos);
+		player->FindComponent<ConstantMover>()->SetDirection(newDir);
+		});
+}
+
+void ServerSimulation::OnShot(int playerId, double dir, FirearmType wpnType, Vector pos)
+{
+	printf("Player %d shot\n", playerId);
+	if (!game.IsRunning())
+		return;
+
+	GameObject* player = game.GetPlayer(playerId);
+	if (player == NULL || player == game.GetControlledPlayer())
+		return;
+
+	game.InvokeOnNextFrame([player, dir, wpnType, pos]() {
+		player->SetRotation(dir);
+		player->SetPosition(pos);
+		PlayerEquipment* eq = player->FindComponent<PlayerEquipment>();
+		eq->EquipWeapon(wpnType);
+		eq->GetCurrentWeapon()->TryShoot();
+		});
+}
+
+
+void ServerSimulation::OnWeaponChanged(int playerId, FirearmType newType)
+{
+	printf("Player %d changed weapon\n", playerId);
+	if (!game.IsRunning())
+		return;
+
+	GameObject* player = game.GetPlayer(playerId);
+	if (player == NULL || player == game.GetControlledPlayer())
+		return;
+
+	game.InvokeOnNextFrame([player, newType]() { player->FindComponent<PlayerEquipment>()->EquipWeapon(newType); });
 }

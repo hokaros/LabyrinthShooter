@@ -40,7 +40,7 @@ public:
 	void Unpause();
 
 	// Umo¿liwia wykonanie funkcji po pewnym czasie
-	void Invoke(function<void()> action, double time);
+	void InvokeOnNextFrame(function<void()> action, double time);
 	// Wykonuje funkcje, których czas nadszed³
 	void InvokeTimed();
 

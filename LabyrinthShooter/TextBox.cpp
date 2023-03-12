@@ -34,14 +34,14 @@ void TextBox::Draw() {
 void TextBox::Update() {
 	// Odczytanie klawiszy
 	for (char digit = '0'; digit <= '9'; digit++) {
-		SDL_KeyCode key = (SDL_KeyCode)digit;
+		SDL_Keycode key = (SDL_Keycode)digit;
 
 		if (InputController::Main()->PressedThisFrame(key)) {
 			AddCharacter(digit);
 		}
 	}
 
-	if (InputController::Main()->PressedThisFrame((SDL_KeyCode)'.')) {
+	if (InputController::Main()->PressedThisFrame((SDL_Keycode)'.')) {
 		AddCharacter('.');
 	}
 

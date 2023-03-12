@@ -56,7 +56,7 @@ void GameRoom::Enter() {
 void GameRoom::DrawWaitingRoom() {
 	char buffer[16];
 	// Informacja o liczbie graczy w poczekalni
-	sprintf_s(buffer, "%d/%d", GetPlayerCount(), NEEDED_PLAYERS);
+	sprintf_s(buffer, "%d/%d", GetPlayerCount(), PLAYERS_NUM);
 	window.DrawString(5, 5, buffer, FONTSIZE_MEDIUM);
 
 	window.DrawString(window.GetWidth()/2 - 15*FONTSIZE_MEDIUM, window.GetHeight()/2 - FONTSIZE_MEDIUM, "Oczekiwanie na graczy...", FONTSIZE_MEDIUM);
@@ -154,7 +154,7 @@ void GameRoom::SubscribeToClient() {
 		if (player == NULL || player == game->GetControlledPlayer())
 			return;
 
-		game->Invoke([player, newDir, pos]() {
+		game->InvokeOnNextFrame([player, newDir, pos]() {
 			player->SetPosition(pos);
 			player->FindComponent<ConstantMover>()->SetDirection(newDir); 
 			});
@@ -179,7 +179,7 @@ void GameRoom::SubscribeToClient() {
 		if (player == NULL || player == game->GetControlledPlayer())
 			return;
 
-		game->Invoke([player, dir, wpnType, pos]() { 
+		game->InvokeOnNextFrame([player, dir, wpnType, pos]() {
 			player->SetRotation(dir);
 			player->SetPosition(pos);
 			PlayerEquipment* eq = player->FindComponent<PlayerEquipment>();
@@ -196,7 +196,7 @@ void GameRoom::SubscribeToClient() {
 		if (player == NULL || player == game->GetControlledPlayer())
 			return;
 
-		game->Invoke([player, newType]() { player->FindComponent<PlayerEquipment>()->EquipWeapon(newType); });
+		game->InvokeOnNextFrame([player, newType]() { player->FindComponent<PlayerEquipment>()->EquipWeapon(newType); });
 	};
 	client->onLabChanged = [this](bool* newWalls) {
 		printf("Lab changed\n");
@@ -204,7 +204,7 @@ void GameRoom::SubscribeToClient() {
 			return;
 
 		LabyrinthSolidifier* lab = game->GetLab();
-		game->Invoke([newWalls, lab]() {lab->SetLab(newWalls); });
+		game->InvokeOnNextFrame([newWalls, lab]() {lab->SetLab(newWalls); });
 	};
 	client->onPlayerHurt = [this](int id, int dmg) {
 		printf("Player %d hurt by %d hp\n", id, dmg);
@@ -215,7 +215,7 @@ void GameRoom::SubscribeToClient() {
 		if (player == NULL)
 			return;
 
-		game->Invoke([player, dmg]() { player->FindComponent<Health>()->Hurt(dmg); });
+		game->InvokeOnNextFrame([player, dmg]() { player->FindComponent<Health>()->Hurt(dmg); });
 	};
 }
 
@@ -250,117 +250,4 @@ void GameRoom::SubscribeToGame() {
 
 		client->Send(Client::CreateMessageWeaponChange(newType));
 	};
-}
-
-
-RoomFinder::RoomFinder(Window& window)
-	: window(window) {
-
-}
-
-RoomFinder::~RoomFinder() {
-	if (client != NULL) {
-		delete client;
-	}
-}
-
-void RoomFinder::EnterSearch() {
-	SDL_Surface* screen = window.GetScreen();
-	int white = SDL_MapRGB(screen->format, 0xFF, 0xFF, 0xFF);
-	int black = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
-
-	SDL_Rect textArea;
-	textArea.x = 50;
-	textArea.y = window.GetHeight() / 2;
-	textArea.w = window.GetWidth() - 2 * 50;
-	textArea.h = 50;
-	TextBox textBox(textArea, white, black, 20);
-
-
-	InputController* input = InputController::Main();
-
-	bool quit = false;
-
-	while (!quit) {
-
-		if (!input->Update()) {
-			quit = 1;
-		}
-
-		if (input->PressedThisFrame(SDLK_RETURN)) {
-			// Testowa próba po³¹czenia z serwerem
-			TryConnect(textBox.GetContent());
-		}
-		else if (input->PressedThisFrame(SDLK_ESCAPE)) {
-			quit = true;
-		}
-
-		// Generowanie t³a
-		SDL_FillRect(screen, NULL, black);
-
-		textBox.Update();
-
-		// Wyœwietlenie wyszukiwarki
-		Draw(textBox);
-
-		window.Render();
-
-
-		if (ShouldEnter()) {
-			RealEnterGameRoom();
-		}
-	}
-}
-
-void RoomFinder::EnterGameRoom() {
-	std::lock_guard<std::mutex> lock(mutex);
-
-	shouldEnter = true;
-}
-
-void RoomFinder::RealEnterGameRoom() {
-	GameRoom gameRoom(window, client);
-	SetCurrentRoom(&gameRoom);
-
-	gameRoom.Enter();
-
-	// Po wyjœciu z pokoju
-	client->Disconnect();
-	SetCurrentRoom(NULL);
-}
-
-GameRoom* RoomFinder::GetCurrentRoom() {
-	std::lock_guard<std::mutex> lock(mutex);
-
-	return currentRoom;
-}
-
-void RoomFinder::SetCurrentRoom(GameRoom* newRoom) {
-	std::lock_guard<std::mutex> lock(mutex);
-
-	currentRoom = newRoom;
-}
-
-void RoomFinder::TryConnect(std::string ip) {
-	if (client != NULL)
-		delete client;
-
-	client = new Client(ip.c_str(), DEFAULT_PORT);
-	client->onJoinAccepted = [this]() {EnterGameRoom(); };
-	client->Connect();
-	client->GameProtocol();
-}
-
-bool RoomFinder::ShouldEnter() {
-	std::lock_guard<std::mutex> lock(mutex);
-
-	bool should = shouldEnter;
-	shouldEnter = false;
-	return should;
-}
-
-void RoomFinder::Draw(TextBox& textBox) {
-	window.DrawString(window.GetWidth() / 2 - FONTSIZE_HEADER * 9, 50, "Podaj ip serwera:", FONTSIZE_HEADER);
-
-	textBox.Draw();
 }

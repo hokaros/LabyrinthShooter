@@ -28,24 +28,7 @@ void Server::WaitForClientConnection() {
 	acceptor.async_accept([&](asio::error_code ec, asio::ip::tcp::socket socket) {
 		if (!ec) {
 			ConnectionHandler<WildMessage>* newConnection = new ConnectionHandler<WildMessage>(++lastClientId, context, std::move(socket));
-			// Subskrypcja zdarzeñ
-			newConnection->onMessageReceived = 
-				[this](int clientId, const Message<WildMessage>& msg) {
-				OnMessageReceived(clientId, msg); 
-			};
-			newConnection->onDisconnected = [this](int clientId) { 
-				if(onClientDisconnected) 
-					onClientDisconnected(clientId); 
-			};
-
-			connections.push_back(newConnection);
-			if (onClientConnected)
-				onClientConnected(lastClientId);
-			//	Dodanie do slownika powiazania id z ConnectionHandler
-			clientIdMap[lastClientId] = newConnection;
-
-			
-			newConnection->OpenInput();
+			SaveNewConnection(newConnection);
 		}
 
 		WaitForClientConnection();
@@ -130,17 +113,7 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 	{
 		//	Dodanie gracza do tablicy
 		ConnectionHandler<WildMessage>* connection = clientIdMap[clientId];
-		bool joined = false;
-		for (int i = 0; i < PLAYERS_NUM; i++)
-		{
-			if (players[i] == NULL)
-			{
-				players[i] = connection;
-				clientIdIndexMap[clientId] = i;
-				joined = true;
-				break;
-			}
-		}
+		bool joined = TryAddPlayer(connection, clientId);
 
 		Message<WildMessage> msg;
 
@@ -149,7 +122,7 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 
 		connection->WriteMessage(msg);
 
-		if (playersReady()) initGame();
+		if (ArePlayersReady()) InitGame();
 
 		break;
 	}
@@ -167,7 +140,40 @@ void Server::OnMessageReceived(int clientId, const Message<WildMessage>& message
 	}
 }
 
-bool Server::playersReady()
+void Server::SaveNewConnection(ConnectionHandler<WildMessage>* newConnection)
+{
+	SubscribeToConnectionEvents(newConnection);
+
+	connections.push_back(newConnection);
+	//	Dodanie do slownika powiazania id z ConnectionHandler
+	clientIdMap[lastClientId] = newConnection;
+
+	newConnection->OpenInput();
+
+	if (onClientConnected)
+		onClientConnected(lastClientId);
+}
+
+void Server::SubscribeToConnectionEvents(ConnectionHandler<WildMessage>* connection)
+{
+	connection->onMessageReceived =
+		[this](int clientId, const Message<WildMessage>& msg) {
+		OnMessageReceived(clientId, msg);
+	};
+	connection->onDisconnected = [this](int clientId) {
+		OnClientDisconnected(clientId);
+	};
+}
+
+void Server::OnClientDisconnected(int clientId)
+{
+	RemovePlayer(clientId);
+
+	if (onClientDisconnected)
+		onClientDisconnected(clientId);
+}
+
+bool Server::ArePlayersReady()
 {
 	bool ready = true;
 	for (int i = 0; i < PLAYERS_NUM; i++)
@@ -180,12 +186,14 @@ bool Server::playersReady()
 	return true;
 }
 
-void Server::initGame()
+void Server::InitGame()
 {
-	GenerateAndSendPositions();
+	PlayerPositionsGenerator positionsGenerator;
+	positionsGenerator.Generate(PLAYERS_NUM, WIDTH, HEIGHT, MAP_START_X, MAP_START_Y);
+
 	for (int i = 0; i < PLAYERS_NUM; i++)
 	{
-		Message<WildMessage> message = CreateMessageGameInit(i);
+		Message<WildMessage> message = CreateMessageGameInit(i, positionsGenerator.GetPlayerPositions());
 		players[i]->WriteMessage(message);
 
 		if (i == 0)
@@ -193,68 +201,48 @@ void Server::initGame()
 	}
 }
 
-void Server::GenerateAndSendPositions() {
-
-	srand((unsigned int)time(NULL));
-	const float offsetX = 50;
-	const float offsetY = 50;
-
-	float tmpX;
-	float tmpY;
-
-
-	for (int i = 0; i < PLAYERS_NUM; i++) {
-
-		while (true) {
-
-			bool inValidPosition = false;
-			tmpX = (float(std::rand()) / float((RAND_MAX)) * WIDTH) + MAP_START_X;
-			tmpY = (float(std::rand()) / float((RAND_MAX)) * HEIGHT) + MAP_START_Y;
-
-			for (int j = 0; j < posX.size(); j++) {
-				if (abs(posX[j] - tmpX) < offsetX && abs(posY[j] - tmpY) < offsetY) inValidPosition = true;
-			}
-
-			if (!inValidPosition) {
-				posY.push_back(tmpY);
-				posX.push_back(tmpX);
-				break;
-			}
+bool Server::TryAddPlayer(ConnectionHandler<WildMessage>* connection, int clientId)
+{
+	for (int i = 0; i < PLAYERS_NUM; i++)
+	{
+		if (players[i] == NULL)
+		{
+			players[i] = connection;
+			clientIdIndexMap[clientId] = i;
+			return true; // Successfully added
 		}
 	}
 
-	/*Message<WildMessage> msg;
-	msg.header.id = WildMessage::POSITION;
-	for (int i = PLAYERS_NUM - 1; i >= 0; i--) {
-		msg << posY[i];
-		msg << posX[i];
-	}
-	MessageAllClients(msg);*/
+	return false;
+}
+
+void Server::RemovePlayer(int clientId)
+{
+	int playerIndex = clientIdIndexMap[clientId];
+	players[playerIndex] = NULL;
 }
 
 void Server::MessageAllClients(const Message<WildMessage>& message) {
 
 	for (int i = 0; i < PLAYERS_NUM; i++) {
-
-		players[i]->WriteMessage(message);
+		if (players[i] != nullptr) {
+			players[i]->WriteMessage(message);
+		}
 	}
 }
 
 //	Creating message functions
-Message<WildMessage> Server::CreateMessageGameInit(int id) {
+Message<WildMessage> Server::CreateMessageGameInit(int id, const std::vector<Vector> playerPositions) {
 
 	Message<WildMessage> message;
 	message.header.id = WildMessage::GAME_STARTED;
-	//	TODO
-
 
 	for (int i = PLAYERS_NUM - 1; i >= 0; i--) {
-		message << posY[i];
-		message << posX[i];
+		message << playerPositions[i].y;
+		message << playerPositions[i].x;
 	}
 
 	message << id;
-	//
 	return message;
 };
 

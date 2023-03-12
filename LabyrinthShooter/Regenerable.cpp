@@ -13,7 +13,7 @@ void Regenerable::OnDestroyed() {
 	if (!gameObject.IsDestroyed())
 		return; // tylko zniszczenie
 
-	Timer::Main()->Invoke([this]() {
+	Timer::Main()->InvokeOnNextFrame([this]() {
 		gameObject.SetDestroyed(false);
 		}, regenerationTime);
 }

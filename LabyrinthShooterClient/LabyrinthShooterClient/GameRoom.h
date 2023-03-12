@@ -8,8 +8,6 @@
 #define FONTSIZE_HEADER 25
 #define FONTSIZE_MEDIUM 14
 
-#define NEEDED_PLAYERS 4
-
 #define DEFAULT_PORT 80
 
 class GameRoom
@@ -54,37 +52,4 @@ private:
 	void OnPlayerJoined();
 	void OnPlayerLeft();
 	void OnGameStarted(int selfId, float positions[PLAYERS_NUM][2]);
-};
-
-
-// Panel, w którym gracz wybiera serwer
-class RoomFinder
-{
-public:
-	RoomFinder(Window& window);
-	~RoomFinder();
-
-	void EnterSearch();
-	void EnterGameRoom();
-
-	GameRoom* GetCurrentRoom();
-
-private:
-	Window& window;
-	GameRoom* currentRoom = NULL;
-	Client* client = NULL;
-
-	bool shouldEnter = false;
-
-	std::mutex mutex;
-
-private:
-	void Draw(TextBox& textBox);
-
-	void SetCurrentRoom(GameRoom* newRoom);
-	// Konsumuj¹ce sprawdzenie sygna³u do wejœcia do pokoju
-	bool ShouldEnter();
-
-	void TryConnect(std::string ip);
-	void RealEnterGameRoom();
 };
