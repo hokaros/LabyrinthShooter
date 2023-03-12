@@ -225,8 +225,9 @@ void Server::RemovePlayer(int clientId)
 void Server::MessageAllClients(const Message<WildMessage>& message) {
 
 	for (int i = 0; i < PLAYERS_NUM; i++) {
-
-		players[i]->WriteMessage(message);
+		if (players[i] != nullptr) {
+			players[i]->WriteMessage(message);
+		}
 	}
 }
 
